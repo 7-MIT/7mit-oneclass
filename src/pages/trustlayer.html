@@ -7,12 +7,13 @@
 <title>TrustLayer · OneClass.7MIT</title>
 <link rel="icon" href="/assets/logo-7mit.jpg">
 <link rel="stylesheet" href="/assets/design.7mit.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <style>
 html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--ink)}
 .tl{max-width:1080px;margin:0 auto;padding:var(--space-6) var(--space-4) var(--space-16)}
 .tl-top{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-8)}
 .tl-brand{display:flex;align-items:center;gap:var(--space-3);font:700 15px var(--font-sans);color:var(--ink);text-decoration:none}
-.tl-brand svg{width:30px;height:30px;color:var(--maroon-soft-ink)}
+.tl-brand svg{width:30px;height:30px;color:var(--maroon-soft-ink);stroke-width:2.2}
 .tl-hero{margin-bottom:var(--space-8)}
 .tl-hero h1{margin:var(--space-2) 0 var(--space-3);font:700 clamp(32px,5vw,52px)/1.05 var(--font-display)}
 .tl-hero h1 em{font-style:normal;color:var(--maroon-soft-ink)}
@@ -42,9 +43,9 @@ html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--in
 <div class="tl">
   <header class="tl-top">
     <a class="tl-brand" href="/" aria-label="Kembali ke OneClass">
-      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" aria-hidden="true"><path d="M32 6 54 15v17c0 13-9 21-22 26C19 53 10 45 10 32V15z"/><path d="m22 32 7 7 13-14" stroke-linecap="round"/></svg>
+      <i data-lucide="shield-check"></i>
       OneClass.7MIT · TrustLayer</a>
-    <div style="display:flex;gap:var(--space-2);flex-wrap:wrap"><a class="m7-btn m7-btn-secondary m7-btn-sm" id="back" href="/">Kembali ke OneClass</a></div>
+    <div style="display:flex;gap:var(--space-2);flex-wrap:wrap"><a class="m7-btn m7-btn-secondary m7-btn-sm" id="back" href="/"><i data-lucide="arrow-left"></i>Kembali ke OneClass</a></div>
   </header>
 
   <section class="tl-hero">
@@ -53,15 +54,15 @@ html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--in
     <p>TrustLayer tidak memblokir akses. Server tetap menegakkan izin; TrustLayer memeriksa apakah keputusan akses, data, dan konfigurasi sudah sesuai aturan, lalu mencatat hasilnya untuk pengelola.</p>
   </section>
 
-  <div class="m7-alert m7-alert-danger" id="denied" role="alert" hidden><div><b>Akses ditolak</b><span id="deniedM">TrustLayer hanya untuk pengelola.</span></div></div>
+  <div class="m7-alert m7-alert-danger" id="denied" role="alert" hidden><i data-lucide="shield-alert"></i><div><b>Akses ditolak</b><span id="deniedM">TrustLayer hanya untuk pengelola.</span></div></div>
 
   <div id="app" hidden>
     <div class="tl-stats" id="stats"></div>
     <div class="tl-bar">
       <div class="tl-last" id="last">Belum ada pemeriksaan penuh.</div>
-      <button class="m7-btn m7-btn-primary" id="run" type="button">Jalankan pemeriksaan</button>
+      <button class="m7-btn m7-btn-primary" id="run" type="button"><i data-lucide="play"></i><span id="runT">Jalankan pemeriksaan</span></button>
     </div>
-    <div class="m7-alert m7-alert-info" id="flash" role="status" hidden style="margin-bottom:var(--space-4)"><div id="flashM"></div></div>
+    <div class="m7-alert m7-alert-info" id="flash" role="status" hidden style="margin-bottom:var(--space-4)"><i data-lucide="info" id="flashI"></i><div id="flashM"></div></div>
 
     <div class="m7-tabs tl-tabs" id="views" role="tablist" aria-label="Tampilan TrustLayer">
       <button class="m7-tab" role="tab" aria-selected="true" data-view="events">Catatan</button>
@@ -83,7 +84,7 @@ html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--in
         <div class="tl-wrap"><table class="tl-rules" id="rules"></table></div></div>
     </section>
 
-    <div class="m7-alert m7-alert-info tl-note"><div><b>TrustLayer adalah</b>lapisan pemeriksaan dan pelaporan. <b style="margin-top:8px">TrustLayer bukan</b>pengganti penegakan izin di server, dan bukan penentu aturan; aturan ditetapkan pengelola.</div></div>
+    <div class="m7-alert m7-alert-info tl-note"><i data-lucide="info"></i><div><b>TrustLayer adalah</b>lapisan pemeriksaan dan pelaporan. <b style="margin-top:8px">TrustLayer bukan</b>pengganti penegakan izin di server, dan bukan penentu aturan; aturan ditetapkan pengelola.</div></div>
   </div>
 </div>
 <script src="/assets/config.js"></script>
@@ -120,13 +121,13 @@ function list(){
     if(e.expected_value||e.observed_value)det.push('<span>Seharusnya <b>'+esc(e.expected_value||'—')+'</b></span><span>Ditemukan <b>'+esc(e.observed_value||'—')+'</b></span>');
     if(e.expected_allowed!==null&&e.observed_allowed!==null&&!e.expected_value)det.push('<span>Aturan <b>'+(e.expected_allowed?'boleh':'tidak boleh')+'</b></span><span>Antarmuka <b>'+(e.observed_allowed?'mengizinkan':'menolak')+'</b></span>');
     det.push('<span>'+when(e.created_at)+' · '+esc(e.source)+(e.portal_mode?' · '+esc(e.portal_mode):'')+'</span>');
-    var act=(e.kind!=='passed'&&e.status==='open')?'<button class="m7-btn m7-btn-secondary m7-btn-sm" data-resolve="'+e.id+'" type="button">Tandai selesai</button>':(e.status==='resolved'?'<span class="m7-badge m7-badge-success">Selesai</span>':'');
+    var act=(e.kind!=='passed'&&e.status==='open')?'<button class="m7-btn m7-btn-secondary m7-btn-sm" data-resolve="'+e.id+'" type="button"><i data-lucide="check"></i>Tandai selesai</button>':(e.status==='resolved'?'<span class="m7-badge m7-badge-success">Selesai</span>':'');
     return '<div class="m7-li tl-item"><div class="m7-li-main"><b>'+esc(e.subject||e.message)+'</b><small>'+esc(e.message)+'</small><div class="tl-kv">'+det.join('')+'</div></div><div class="m7-li-side"><span class="m7-badge m7-badge-'+k[1]+'">'+esc(k[0])+'</span>'+act+'</div></div>';
   }).join('');
 }
 async function loadEvents(){
   var d=await api({action:'list_events',kind:st.kind,status:st.kind==='passed'&&st.status==='open'?'all':st.status,limit:100});
-  st.events=d.events;list();
+  st.events=d.events;list();icons();
 }
 async function loadSummary(){var d=await api({action:'summary'});st.counts=d.counts;stats();last(d.last_run)}
 async function loadRules(){
@@ -134,7 +135,8 @@ async function loadRules(){
   var T={student:'Siswa',guru:'Guru',pengurus:'Pengurus'};
   $('rules').innerHTML='<thead><tr><th>Tipe</th><th>Peran</th><th>Sumber daya</th><th>Tindakan</th><th>Data</th><th>Hasil</th></tr></thead><tbody>'+d.rules.filter(function(r){return ['dues','class_data','trustlayer','inventory'].indexOf(r.resource)>=0}).map(function(r){return '<tr><td>'+T[r.account_type]+'</td><td>'+esc(r.role_pattern||'semua')+'</td><td>'+esc(r.resource)+'</td><td>'+(r.action==='view'?'lihat':'ubah')+'</td><td>'+(r.ownership==='own'?'milik sendiri':'milik siapa saja')+'</td><td><span class="m7-badge m7-badge-'+(r.allowed?'success':'danger')+'">'+(r.allowed?'boleh':'tidak boleh')+'</span></td></tr>'}).join('')+'</tbody>';
 }
-function flash(msg,kind){var f=$('flash');f.className='m7-alert m7-alert-'+(kind||'info');$('flashM').textContent=msg;f.hidden=false}
+function icons(){try{window.lucide&&window.lucide.createIcons()}catch(e){}}
+function flash(msg,kind){var f=$('flash');f.className='m7-alert m7-alert-'+(kind||'info');$('flashM').textContent=msg;f.hidden=false;var old=f.querySelector('svg,i');var ni=document.createElement('i');ni.setAttribute('data-lucide',kind==='danger'?'circle-alert':kind==='warning'?'triangle-alert':kind==='success'?'circle-check':'info');if(old)old.replaceWith(ni);else f.prepend(ni);icons()}
 document.addEventListener('click',async function(e){
   var t=e.target.closest&&e.target.closest('[data-kind],[data-status],[data-view],[data-resolve]');
   if(t&&t.dataset.kind){st.kind=t.dataset.kind;stats();await loadEvents();return}
@@ -143,10 +145,11 @@ document.addEventListener('click',async function(e){
   if(t&&t.dataset.resolve){t.disabled=true;try{await api({action:'resolve_event',id:Number(t.dataset.resolve)});await Promise.all([loadSummary(),loadEvents()])}catch(err){flash(err.message,'danger');t.disabled=false}return}
 });
 $('run').addEventListener('click',async function(){
-  var b=this;b.disabled=true;b.textContent='Memeriksa…';
+  var b=this;b.disabled=true;$('runT').textContent='Memeriksa…';
   try{var r=await api({action:'run_checks'});st.counts=r.counts;stats();last(r.last_run);flash('Pemeriksaan selesai: '+r.passed+' berhasil, '+(r.access+r.data+r.config+r.connection)+' temuan baru (akses '+r.access+', data '+r.data+', konfigurasi '+r.config+', koneksi '+r.connection+').',(r.access+r.data+r.config+r.connection)?'warning':'success');await loadEvents()}
-  catch(e){flash(e.message,'danger')}finally{b.disabled=false;b.textContent='Jalankan pemeriksaan'}
+  catch(e){flash(e.message,'danger')}finally{b.disabled=false;$('runT').textContent='Jalankan pemeriksaan'}
 });
+window.addEventListener('load',icons);
 (async function(){
   if(!sess){location.replace('/');return}
   $('back').href=S.homeFor(sess.profile.account_type||'student');

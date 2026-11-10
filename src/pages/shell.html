@@ -8,6 +8,7 @@
 <title>OneClass.7MIT · Masuk</title>
 <link rel="icon" href="/assets/logo-7mit.jpg">
 <link rel="stylesheet" href="/assets/design.7mit.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <style>
 html,body{margin:0;min-height:100%}
 body{background:var(--surface);color:var(--ink)}
@@ -36,16 +37,17 @@ body{background:var(--surface);color:var(--ink)}
 .oc-role:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .oc-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-3)}
 .oc-steps li{display:flex;align-items:center;gap:var(--space-3);font-size:14px;color:var(--ink-muted)}
-.oc-dot{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line-strong);display:grid;place-items:center;font-size:12px;font-weight:800}
-.oc-steps li.run{color:var(--ink)}.oc-steps li.run .oc-dot{border-color:var(--maroon);border-top-color:transparent;animation:oc-spin .8s linear infinite}
+.oc-dot{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line-strong);display:grid;place-items:center}.oc-dot svg{width:13px;height:13px;stroke-width:3}
+.oc-steps li.run{color:var(--ink)}.oc-steps li.run .oc-dot{border-color:transparent}.oc-steps li.run .oc-dot svg{width:20px;height:20px;stroke-width:2.5;color:var(--maroon);animation:oc-spin .8s linear infinite}
 .oc-steps li.ok{color:var(--ink)}.oc-steps li.ok .oc-dot{background:var(--success-soft);border-color:var(--success-ink);color:var(--success-ink)}
 .oc-steps li.warn .oc-dot{background:var(--warning-soft);border-color:var(--warning-ink);color:var(--warning-ink)}
 @keyframes oc-spin{to{transform:rotate(360deg)}}
 .oc-foot{margin:var(--space-5) 0 0;text-align:center;font-size:12px;color:var(--ink-muted)}
 .oc-foot a{color:var(--maroon-soft-ink);font-weight:700}
+.oc-role svg{width:18px;height:18px;flex:none}
 [hidden]{display:none!important}
 @media(max-width:880px){.oc{grid-template-columns:1fr}.oc-hero{padding:var(--space-8) var(--space-6);min-height:auto}.oc-hero h1{font-size:40px}.oc-watermark{font-size:300px}}
-@media (prefers-reduced-motion:reduce){.oc-steps li.run .oc-dot{animation:none}}
+@media (prefers-reduced-motion:reduce){.oc-steps li.run .oc-dot svg{animation:none}}
 </style>
 </head>
 <body>
@@ -65,23 +67,22 @@ body{background:var(--surface);color:var(--ink)}
     <div class="m7-card oc-card" id="card">
       <div id="viewLogin" class="oc-stack">
         <div><h2 class="m7-card-title">Masuk ke OneClass</h2><p class="m7-card-sub">Pakai username dan password akun.7mit.</p></div>
-        <div class="m7-alert m7-alert-danger" id="err" role="alert" hidden><div><b id="errT">Gagal masuk</b><span id="errM"></span></div></div>
+        <div class="m7-alert m7-alert-danger" id="err" role="alert" hidden><i data-lucide="circle-alert"></i><div><b id="errT">Gagal masuk</b><span id="errM"></span></div></div>
         <form id="form" class="oc-stack" novalidate>
-          <div class="m7-field"><label class="m7-label" for="u">Username</label><input class="m7-input" id="u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="contoh: baradeva" required><span class="m7-help">Tanpa @7mit.</span></div>
-          <div class="m7-field"><label class="m7-label" for="p">Password</label><div class="oc-pw"><input class="m7-input" id="p" name="password" type="password" autocomplete="current-password" required><button type="button" class="m7-btn m7-btn-ghost m7-btn-sm" id="showPw" aria-pressed="false">Tampilkan</button></div></div>
-          <button class="m7-btn m7-btn-primary m7-btn-lg" id="go" type="submit">Masuk</button>
+          <div class="m7-field"><label class="m7-label" for="u">Username</label><input class="m7-input" id="u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="contoh atau contoh@7mit" required><span class="m7-help">Boleh dengan atau tanpa @7mit.</span></div>
+          <div class="m7-field"><label class="m7-label" for="p">Password</label><div class="oc-pw"><input class="m7-input" id="p" name="password" type="password" autocomplete="current-password" required><button type="button" class="m7-btn m7-btn-ghost m7-btn-sm" id="showPw" aria-pressed="false"><i data-lucide="eye"></i><span>Tampilkan</span></button></div></div>
+          <button class="m7-btn m7-btn-primary m7-btn-lg" id="go" type="submit"><i data-lucide="log-in"></i><span id="goT">Masuk</span></button>
         </form>
         <div class="oc-sep">atau</div>
         <button class="m7-btn m7-btn-secondary" id="google" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.4z"/><path fill="#34A853" d="M12 23.5c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.4 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v3C3.7 21 7.5 23.5 12 23.5z"/><path fill="#FBBC05" d="M5.6 14.2a6.9 6.9 0 0 1 0-4.4v-3H1.8a11.5 11.5 0 0 0 0 10.4l3.8-3z"/><path fill="#EA4335" d="M12 5.4c1.7 0 3.2.6 4.4 1.7l3.3-3.3A11.4 11.4 0 0 0 12 .5C7.5.5 3.7 3 1.8 6.8l3.8 3C6.5 7.4 9 5.4 12 5.4z"/></svg>
-          Masuk dengan Google</button>
+          <i data-lucide="circle-user-round"></i>Masuk dengan Google</button>
         <p class="oc-foot">Belum punya akun? Daftar di <a href="https://akun.7mit.org" rel="noopener">akun.7mit.org</a>.</p>
       </div>
 
       <div id="viewRoles" class="oc-stack" hidden>
         <div><h2 class="m7-card-title">Pilih peran</h2><p class="m7-card-sub" id="rolesSub">Username ini punya lebih dari satu akun.</p></div>
         <div class="oc-roles" id="roles"></div>
-        <button class="m7-btn m7-btn-ghost" id="rolesBack" type="button">Kembali</button>
+        <button class="m7-btn m7-btn-ghost" id="rolesBack" type="button"><i data-lucide="arrow-left"></i>Kembali</button>
       </div>
 
       <div id="viewSteps" class="oc-stack" hidden>
@@ -92,8 +93,8 @@ body{background:var(--surface);color:var(--ink)}
           <li data-s="trust"><span class="oc-dot"></span><span>Pemeriksaan TrustLayer</span></li>
           <li data-s="open"><span class="oc-dot"></span><span>Membuka ruang kerja</span></li>
         </ol>
-        <div class="m7-alert m7-alert-danger" id="err2" role="alert" hidden><div><b>Tidak bisa melanjutkan</b><span id="err2M"></span></div></div>
-        <div id="stepsActions" hidden><button class="m7-btn m7-btn-secondary" id="stepsBack" type="button">Kembali ke halaman masuk</button></div>
+        <div class="m7-alert m7-alert-danger" id="err2" role="alert" hidden><i data-lucide="circle-alert"></i><div><b>Tidak bisa melanjutkan</b><span id="err2M"></span></div></div>
+        <div id="stepsActions" hidden><button class="m7-btn m7-btn-secondary" id="stepsBack" type="button"><i data-lucide="arrow-left"></i>Kembali ke halaman masuk</button></div>
       </div>
     </div>
   </section>
@@ -106,9 +107,10 @@ var C=window.ONECLASS_CONFIG,S=window.OneClassSession,$=function(i){return docum
 var pendingCreds=null;
 var LABEL={student:'Siswa',guru:'Guru',pengurus:'Pengurus'};
 function view(n){['viewLogin','viewRoles','viewSteps'].forEach(function(v){$(v).hidden=v!==n})}
-function showErr(t,m){$('errT').textContent=t;$('errM').textContent=m||'';$('err').hidden=false}
+function showErr(t,m){$('errT').textContent=t;$('errM').textContent=m||'';$('err').hidden=false;icons()}
 function hideErr(){$('err').hidden=true}
-function step(name,state){var li=document.querySelector('#steps li[data-s="'+name+'"]');if(!li)return;li.className=state;li.querySelector('.oc-dot').textContent=state==='ok'?'✓':state==='warn'?'!':''}
+function icons(){try{window.lucide&&window.lucide.createIcons()}catch(e){}}
+function step(name,state){var li=document.querySelector('#steps li[data-s="'+name+'"]');if(!li)return;li.className=state;var ic=state==='ok'?'check':state==='warn'?'triangle-alert':state==='run'?'loader-circle':'';li.querySelector('.oc-dot').innerHTML=ic?'<i data-lucide="'+ic+'"></i>':'';icons()}
 function resetSteps(){['auth','role','trust','open'].forEach(function(s){step(s,'')});$('err2').hidden=true;$('stepsActions').hidden=true}
 async function enter(token,profile,opts){
   opts=opts||{};view('viewSteps');resetSteps();
@@ -133,7 +135,7 @@ async function enter(token,profile,opts){
   }
 }
 async function login(accountKey){
-  hideErr();var b=$('go');b.disabled=true;b.textContent='Memeriksa…';
+  hideErr();var b=$('go');b.disabled=true;$('goT').textContent='Memeriksa…';
   try{
     var r=await S.akun({action:'login',username:pendingCreds.u,password:pendingCreds.p,account_key:accountKey||''});
     if(r.status===409&&r.data.selection_required){showRoles(r.data.accounts||[]);return}
@@ -141,7 +143,7 @@ async function login(accountKey){
     pendingCreds=null;$('p').value='';
     await enter(r.data.token,r.data.profile);
   }catch(e){showErr('Gagal masuk',String(e&&e.message||'Coba lagi.'));view('viewLogin')}
-  finally{b.disabled=false;b.textContent='Masuk'}
+  finally{b.disabled=false;$('goT').textContent='Masuk'}
 }
 function showRoles(accounts){
   var box=$('roles');box.innerHTML='';
@@ -149,10 +151,10 @@ function showRoles(accounts){
     var btn=document.createElement('button');btn.type='button';btn.className='oc-role';
     var l=document.createElement('span');l.innerHTML='<span></span><small></small>';
     l.firstChild.textContent=LABEL[a.account_type]||a.account_type;l.lastChild.textContent=a.role||a.label||'';
-    var go=document.createElement('span');go.setAttribute('aria-hidden','true');go.textContent='→';
+    var go=document.createElement('span');go.setAttribute('aria-hidden','true');go.innerHTML='<i data-lucide="arrow-right"></i>';
     btn.appendChild(l);btn.appendChild(go);btn.addEventListener('click',function(){login(a.account_key)});box.appendChild(btn)});
   $('rolesSub').textContent='Username "'+pendingCreds.u+'" punya '+accounts.length+' akun. Pilih peran untuk sesi ini.';
-  view('viewRoles');
+  view('viewRoles');icons();
 }
 $('form').addEventListener('submit',function(e){
   e.preventDefault();var u=$('u').value.trim().toLowerCase().replace(/@7mit$/,''),p=$('p').value;
@@ -166,6 +168,7 @@ $('google').addEventListener('click',async function(){
   hideErr();var b=this;b.disabled=true;
   try{await S.startGoogle()}catch(e){showErr('Sign in with Google gagal dimulai',String(e&&e.message||''));b.disabled=false}
 });
+window.addEventListener('load',icons);
 (async function boot(){
   var q=new URLSearchParams(location.search);
   if(q.get('keluar')){try{await S.logout()}catch(e){}history.replaceState(null,'','/');return}

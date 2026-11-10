@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex, nofollow"><meta name="referrer" content="no-referrer"><meta name="color-scheme" content="light dark">
 <title>Masuk dengan Google · OneClass.7MIT</title>
 <link rel="stylesheet" href="/assets/design.7mit.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <style>
 html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--ink)}
 main{min-height:100vh;display:grid;place-items:center;padding:var(--space-6)}
@@ -13,18 +14,19 @@ main{min-height:100vh;display:grid;place-items:center;padding:var(--space-6)}
 .card .eyebrow{display:block;margin-bottom:var(--space-4);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-muted)}
 .ico{width:56px;height:56px;margin:0 auto var(--space-4);border-radius:50%;display:grid;place-items:center;background:var(--maroon-soft);color:var(--maroon-soft-ink)}
 .ico svg{width:28px;height:28px}.ok .ico{background:var(--success-soft);color:var(--success-ink)}.err .ico{background:var(--danger-soft);color:var(--danger-ink)}
-.spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--line-strong);border-top-color:var(--maroon);animation:s .8s linear infinite}
+.spin{animation:s .8s linear infinite}
 @keyframes s{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.spin{animation:none}}
 h1{margin:0 0 var(--space-2);font:700 22px/28px var(--font-display)}p{margin:0;color:var(--ink-muted);font-size:14px;line-height:22px}
 .row{display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap;margin-top:var(--space-5)}
 .roles{display:flex;flex-direction:column;gap:var(--space-2);margin-top:var(--space-5);text-align:left}
 .role{display:flex;justify-content:space-between;align-items:center;min-height:56px;padding:var(--space-3) var(--space-4);border:1.5px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface-raised);color:var(--ink);font:700 15px var(--font-sans);cursor:pointer}
 .role small{display:block;font-weight:400;color:var(--ink-muted)}.role:hover{border-color:var(--maroon);background:var(--maroon-soft)}.role:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.role svg{width:18px;height:18px;flex:none}
 [hidden]{display:none!important}
 </style></head>
 <body><main><section class="m7-card card" id="card" role="status" aria-live="polite">
 <span class="eyebrow">OneClass.7MIT</span>
-<div class="ico" id="ico"><div class="spin"></div></div>
+<div class="ico" id="ico"><i data-lucide="loader-circle" class="spin"></i></div>
 <h1 id="t">Memverifikasi akun Google…</h1><p id="m">Tunggu sebentar, kamu diarahkan otomatis.</p>
 <div class="roles" id="roles" hidden></div>
 <div class="row" id="a" hidden></div>
@@ -35,13 +37,13 @@ h1{margin:0 0 var(--space-2);font:700 22px/28px var(--font-display)}p{margin:0;c
 (function(){
 var S=window.OneClassSession,$=function(i){return document.getElementById(i)};
 var LABEL={student:'Siswa',guru:'Guru',pengurus:'Pengurus'};
-var OK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
-var ERR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>';
+var OK='<i data-lucide="check"></i>',ERR='<i data-lucide="circle-alert"></i>',BUSY='<i data-lucide="loader-circle" class="spin"></i>';
+function icons(){try{window.lucide&&window.lucide.createIcons()}catch(e){}}
 function state(kind,title,msg,actions){
-  $('card').className='m7-card card '+kind;$('ico').innerHTML=kind==='ok'?OK:kind==='err'?ERR:'<div class="spin"></div>';
+  $('card').className='m7-card card '+kind;$('ico').innerHTML=kind==='ok'?OK:kind==='err'?ERR:BUSY;
   $('t').textContent=title;$('m').textContent=msg||'';$('roles').hidden=true;
   var a=$('a');a.innerHTML='';a.hidden=!(actions&&actions.length);
-  (actions||[]).forEach(function(x){var l=document.createElement('a');l.className='m7-btn '+(x.alt?'m7-btn-secondary':'m7-btn-primary');l.href=x.href;l.textContent=x.label;a.appendChild(l)});
+  (actions||[]).forEach(function(x){var l=document.createElement('a');l.className='m7-btn '+(x.alt?'m7-btn-secondary':'m7-btn-primary');l.href=x.href;l.textContent=x.label;a.appendChild(l)});icons();
 }
 function clean(){try{history.replaceState(null,'',location.pathname)}catch(e){}}
 function done(){try{sessionStorage.removeItem(S.INTENT)}catch(e){}}
@@ -86,8 +88,8 @@ async function run(){
     try{await S.akun({action:'logout',token:d.token})}catch(e){}
     state('busy','Pilih peran','Akun Google ini terhubung ke username '+d.username+' dengan beberapa peran.');
     var box=$('roles');box.innerHTML='';box.hidden=false;
-    types.forEach(function(t){var b=document.createElement('button');b.type='button';b.className='role';b.innerHTML='<span><span></span><small></small></span><span aria-hidden="true">→</span>';b.firstChild.firstChild.textContent=LABEL[t]||t;b.firstChild.lastChild.textContent='Masuk sebagai '+(LABEL[t]||t).toLowerCase();
-      b.addEventListener('click',async function(){box.hidden=true;state('busy','Menyiapkan sesi…','');try{var r=await call(t);await finish(c,r)}catch(e){fail(String(e&&e.message||'Gagal memilih peran.'))}});box.appendChild(b)});
+    types.forEach(function(t){var b=document.createElement('button');b.type='button';b.className='role';b.innerHTML='<span><span></span><small></small></span><span aria-hidden="true"><i data-lucide="arrow-right"></i></span>';b.firstChild.firstChild.textContent=LABEL[t]||t;b.firstChild.lastChild.textContent='Masuk sebagai '+(LABEL[t]||t).toLowerCase();
+      b.addEventListener('click',async function(){box.hidden=true;state('busy','Menyiapkan sesi…','');try{var r=await call(t);await finish(c,r)}catch(e){fail(String(e&&e.message||'Gagal memilih peran.'))}});box.appendChild(b)});icons();
     return;
   }
   if(!d.token||!d.profile)throw new Error('Sesi akun.7mit dari Google tidak berhasil dibuat.');

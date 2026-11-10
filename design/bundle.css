@@ -113,6 +113,7 @@ body { margin: 0; font-family: var(--font-sans, "Inter", system-ui, sans-serif);
 /* Alert */
 .m7-alert { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-4); border-radius: var(--radius-md); font-size: 14px; line-height: 20px; border: 1px solid transparent; }
 .m7-alert b { display: block; margin-bottom: 2px; }
+.m7-alert > svg { flex: none; width: 20px; height: 20px; margin-top: 1px; }
 .m7-alert-success { background: var(--success-soft); color: var(--success-ink); border-color: color-mix(in srgb, var(--success-ink) 25%, transparent); }
 .m7-alert-warning { background: var(--warning-soft); color: var(--warning-ink); border-color: color-mix(in srgb, var(--warning-ink) 25%, transparent); }
 .m7-alert-info { background: var(--info-soft); color: var(--info-ink); border-color: color-mix(in srgb, var(--info-ink) 25%, transparent); }
