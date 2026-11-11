@@ -39,6 +39,17 @@ python3 tools/design_css.py   # hanya CSS design.7mit (dipanggil build.py)
 `tools/merge.py` dipakai sekali untuk menggabungkan tiga portal lama menjadi sumber ini. Hasil build per peran
 terbukti identik dengan berkas portal asalnya sebelum tambalan OneClass diterapkan.
 
+## Tampilan (design.7mit)
+
+Halaman masuk, callback, dan TrustLayer memakai token dan komponen design.7mit langsung (`public/assets/design.7mit.css`, dihasilkan dari `design/`).
+Ruang kerja ikut tampilan yang sama lewat dua lapis:
+
+1. `tools/retheme.py` mengganti palet biru/slate portal lama menjadi palet design.7mit (marun, krem, abu hangat; tema Marun untuk mode gelap) di seluruh CSS dan JS.
+2. `src/theme/oneclass-theme.css` mengunci aksen ke marun, memakai Lora untuk judul dan Inter untuk isi, dan menyembunyikan pilihan warna interface.
+
+Halaman login bawaan tiap portal (gerbang siswa dan akses) dihapus saat build; login hanya di `/`.
+Lupa password mengarah ke https://akun.7mit.org/forgot-pwd.
+
 ## TrustLayer (server.7mit)
 
 Tabel: `kelas7mit_trustlayer_rules`, `_events`, `_runs`, `_config`, `_endpoints` (kolom biasa, tanpa JSON).

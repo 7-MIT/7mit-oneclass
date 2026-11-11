@@ -45,6 +45,7 @@ body{background:var(--surface);color:var(--ink)}
 .oc-foot{margin:var(--space-5) 0 0;text-align:center;font-size:12px;color:var(--ink-muted)}
 .oc-foot a{color:var(--maroon-soft-ink);font-weight:700}
 .oc-role svg{width:18px;height:18px;flex:none}
+.oc-forgot{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:2px;font-size:13px;font-weight:700;color:var(--maroon-soft-ink);text-decoration:none}.oc-forgot svg{width:15px;height:15px}.oc-forgot:hover{text-decoration:underline}.oc-forgot:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:4px}
 [hidden]{display:none!important}
 @media(max-width:880px){.oc{grid-template-columns:1fr}.oc-hero{padding:var(--space-8) var(--space-6);min-height:auto}.oc-hero h1{font-size:40px}.oc-watermark{font-size:300px}}
 @media (prefers-reduced-motion:reduce){.oc-steps li.run .oc-dot svg{animation:none}}
@@ -70,7 +71,7 @@ body{background:var(--surface);color:var(--ink)}
         <div class="m7-alert m7-alert-danger" id="err" role="alert" hidden><i data-lucide="circle-alert"></i><div><b id="errT">Gagal masuk</b><span id="errM"></span></div></div>
         <form id="form" class="oc-stack" novalidate>
           <div class="m7-field"><label class="m7-label" for="u">Username</label><input class="m7-input" id="u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="contoh atau contoh@7mit" required><span class="m7-help">Boleh dengan atau tanpa @7mit.</span></div>
-          <div class="m7-field"><label class="m7-label" for="p">Password</label><div class="oc-pw"><input class="m7-input" id="p" name="password" type="password" autocomplete="current-password" required><button type="button" class="m7-btn m7-btn-ghost m7-btn-sm" id="showPw" aria-pressed="false"><i data-lucide="eye"></i><span>Tampilkan</span></button></div></div>
+          <div class="m7-field"><label class="m7-label" for="p">Password</label><div class="oc-pw"><input class="m7-input" id="p" name="password" type="password" autocomplete="current-password" required><button type="button" class="m7-btn m7-btn-ghost m7-btn-sm" id="showPw" aria-pressed="false"><i data-lucide="eye"></i><span>Tampilkan</span></button></div><a class="oc-forgot" href="https://akun.7mit.org/forgot-pwd" target="_blank" rel="noopener noreferrer"><i data-lucide="key-round"></i>Lupa password?</a></div>
           <button class="m7-btn m7-btn-primary m7-btn-lg" id="go" type="submit"><i data-lucide="log-in"></i><span id="goT">Masuk</span></button>
         </form>
         <div class="oc-sep">atau</div>
@@ -171,6 +172,8 @@ $('google').addEventListener('click',async function(){
 window.addEventListener('load',icons);
 (async function boot(){
   var q=new URLSearchParams(location.search);
+  // Google kadang kembali ke alamat utama (bukan /auth/callback): teruskan ke halaman callback.
+  if(q.get('code')||q.get('k7_google')==='callback'||q.get('error_description')||/access_token=/.test(location.hash)){location.replace('/auth/callback'+location.search+location.hash);return}
   if(q.get('keluar')){try{await S.logout()}catch(e){}history.replaceState(null,'','/');return}
   var saved=S.read();
   if(!saved)return;

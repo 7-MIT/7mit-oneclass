@@ -2,6 +2,8 @@
 """Bangun OneClass.7MIT: satu sumber (src/oneclass.src.html) -> ruang kerja per peran + halaman masuk, callback, TrustLayer.
 Jalankan dari akar repo:  python3 tools/build.py"""
 import os, re, shutil, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
+from retheme import retheme
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 APP_VERSION = '1.0.0'
@@ -23,8 +25,29 @@ def sub1(pattern, repl, text, what, flags=0):
     if n != 1: sys.exit('Tambalan gagal (%s) untuk pola: %s' % (what, pattern))
     return new
 
+def remove_gate(html):
+    """Hapus halaman login bawaan tiap portal (studentGate / accessGate): login hanya di halaman masuk OneClass.
+    Kode lama masih mencari beberapa elemennya lewat id; untuk itu dipasang penampung tersembunyi tanpa isi
+    (bukan halaman login) supaya tidak ada galat."""
+    m = re.search(r'(<body)([^>]*)(>)([\s\S]*?)(<div class="mobile-top">)', html)
+    if not m or ('studentGate' not in m.group(4) and 'accessGate' not in m.group(4)):
+        sys.exit('Gerbang login tidak ditemukan untuk dihapus')
+    stubs, seen = [], set()
+    for tm in re.finditer(r'<(input|select|button|form|textarea)\b[^>]*?\bid="([^"]+)"|<([a-z0-9]+)\b[^>]*?\bid="([^"]+)"', m.group(4)):
+        tag, i = (tm.group(1), tm.group(2)) if tm.group(1) else ('div', tm.group(4))
+        if i in seen: continue
+        seen.add(i)
+        stubs.append('<%s id="%s"%s></%s>' % (tag, i, ' type="button"' if tag == 'button' else '', tag))
+    holder = '<div id="oc-legacy-gate-stubs" hidden aria-hidden="true" inert>' + ''.join(stubs) + '</div>\n'
+    return html[:m.start()] + '<body>\n' + holder + html[m.start(5):]
+
 def patch(html, mode):
     label = MODES[mode]
+    html = remove_gate(html)
+    # pesan gerbang lama tidak punya elemen lagi: jadikan aman
+    html, n = re.subn(r'(function show(?:Access|StudentGate)Message\(message,type\)\{)', r'\1\n    if(!document.getElementById("%s"))return;' % ('studentGateMessage' if mode == 'student' else 'accessMessage'), html)
+    if n != 1: sys.exit('Tambalan pesan gerbang gagal (%d)' % n)
+    html = retheme(html)
     # 1. alamat rumah = halaman masuk OneClass di domain yang sama
     html = sub1(r'const PORTAL_HOME_URL="https://[a-z]+\.7mit\.org";', 'const PORTAL_HOME_URL=location.origin+"/";', html, 'PORTAL_HOME_URL')
     # 2. tanpa sesi / sesi tak sesuai: kembali ke halaman masuk OneClass (bukan gerbang lama)
@@ -32,6 +55,11 @@ def patch(html, mode):
     # 2b. jalur /app/<peran>/ dipertahankan (aplikasi lama menimpa alamat menjadi "/")
     html = sub1(r'history\.replaceState\(\{\.\.\.\(history\.state\|\|\{\}\),account\},"","/"\)', 'history.replaceState({...(history.state||{}),account},"",location.pathname)', html, 'replaceState account')
     html = sub1(r'try\{if\(portalPathNoSlash\(\)!=="/"\)history\.replaceState\(history\.state\|\|\{\},"","/"\)\}catch\(error\)\{\}', '/* OneClass: jalur ruang kerja dipertahankan */', html, 'replaceState path')
+    # 2c. reset password -> akun.7mit.org/forgot-pwd
+    html = html.replace('https://forms.gle/oFDHXbMW7xqjknnh6', 'https://akun.7mit.org/forgot-pwd')
+    html = html.replace('ajukan reset melalui formulir resmi atau hubungi Support Center', 'atur ulang lewat akun.7mit atau hubungi Support Center')
+    html = html.replace('Reset password dilakukan melalui formulir resmi atau Support Center', 'Reset password dilakukan melalui akun.7mit atau Support Center')
+    html = html.replace('Form Reset Password', 'Reset Password')
     # 3. judul
     html = sub1(r'<title>[^<]*</title>', '<title>OneClass.7MIT · %s</title>' % label, html, 'title')
     # 4. penjaga awal + penanda mode (sebelum skrip lain berjalan)
@@ -40,7 +68,8 @@ def patch(html, mode):
              'if(!ok){location.replace("/");}}catch(e){location.replace("/")}})();</script>') % (mode, APP_VERSION, mode)
     html = sub1(r'(<meta charset="utf-8">)', lambda m: m.group(1) + '\n' + guard, html, 'meta charset', re.I)
     # 5. TrustLayer: konfigurasi, sesi bersama, dan klien pemeriksa
-    tail = ('<script src="/assets/config.js"></script>\n<script src="/assets/oneclass-session.js"></script>\n'
+    html = sub1(r'</head>', '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,600;0,700;1,600;1,700&display=swap">\n</head>', html, 'head end')
+    tail = ('<link rel="stylesheet" href="/assets/oneclass-theme.css">\n<script src="/assets/config.js"></script>\n<script src="/assets/oneclass-session.js"></script>\n'
             '<script src="/trustlayer/client.js" defer></script>\n')
     i = html.rindex('</body>')
     return html[:i] + tail + html[i:]
@@ -65,6 +94,7 @@ def main():
     for src_page, dst in (('shell.html', 'public/index.html'), ('callback.html', 'public/auth/callback/index.html'), ('trustlayer.html', 'public/trustlayer/index.html')):
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copyfile('src/pages/' + src_page, dst)
+    shutil.copyfile('src/theme/oneclass-theme.css', 'public/assets/oneclass-theme.css')
     os.system('python3 tools/design_css.py')
 
 if __name__ == '__main__':

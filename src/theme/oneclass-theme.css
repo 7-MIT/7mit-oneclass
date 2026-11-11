@@ -1,0 +1,15 @@
+/* OneClass.7MIT — ruang kerja mengikuti design.7mit. Palet sudah diganti oleh tools/retheme.py; file ini mengunci aksen dan merapikan tipografi. */
+:root{--oc-display:"Lora",Georgia,"Times New Roman",serif;--oc-sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+html,html[data-accent]{--accent-primary:#7a1424!important;--accent-secondary:#a01d2d!important;--accent-rgb:122,20,36!important;--accent-secondary-rgb:160,29,45!important;--blue:#7a1424!important;--cyan:#a01d2d!important}
+body{font-family:var(--oc-sans)}
+
+/* Tipografi design.7mit: Lora untuk judul, Inter untuk isi */
+.page h1,.page h2,.page .panel-head h3,.page .card h3,.page h3{font-family:var(--oc-display);letter-spacing:-.005em}
+.nav-brand h1,.brand h2,.sidebar h2,.mobile-top h1{font-family:var(--oc-sans)}
+
+/* Aksen dikunci ke marun design.7mit: pilihan warna interface disembunyikan */
+.interface-color-grid,.panel-head:has(+ .interface-color-grid),.divider:has(+ .panel-head + .interface-color-grid){display:none!important}
+
+/* Menu aktif terbaca di tema Marun (gelap) */
+html[data-theme-resolved="dark"] .nav button.active,html[data-theme-resolved="dark"][data-accent] .nav button.active,html[data-theme-resolved="dark"][data-accent] #nav button.active{color:#fff4ee!important;background:rgba(255,227,210,.12)!important}
+html[data-theme-resolved="dark"] .nav button.active .nav-icon,html[data-theme-resolved="dark"][data-accent] .nav button.active .nav-icon{color:#ffb59a!important}
