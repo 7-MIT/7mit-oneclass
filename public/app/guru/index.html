@@ -10155,11 +10155,6 @@ html[data-theme-resolved="dark"]{
 html,body{min-height:100%;background:var(--bg)}
 .app{min-height:100svh!important}
 main,.main-content{min-height:100svh!important}
-#pricing.page.active{
-  min-height:100svh!important;
-  padding-bottom:max(48px,env(safe-area-inset-bottom))!important;
-}
-#pricing .pricing-page-shell{min-height:calc(100svh - 140px)}
 @media(min-width:901px){
   .sidebar{
     position:fixed!important;
@@ -11332,7 +11327,6 @@ html[data-theme-resolved="dark"] .quiz-choice-note-v141{
       <button data-page="selfReflections"><span class="nav-icon"><i data-lucide="notebook-pen"></i></span>Self Reflections</button>
       <button data-page="notes"><span class="nav-icon"><i data-lucide="notebook-pen"></i></span>Catatan</button>
       
-      <button data-page="pricing"><span class="nav-icon"><i data-lucide="ban"></i></span>Pricing</button>
 <button data-page="news"><span class="nav-icon"><i data-lucide="newspaper"></i></span>Berita Kelas</button>
       <button data-page="announcements"><span class="nav-icon"><i data-lucide="megaphone"></i></span>Pengumuman & Kalender</button>
       <button data-page="tasks"><span class="nav-icon"><i data-lucide="list-checks"></i></span>Tugas & Piket</button>
@@ -12525,19 +12519,6 @@ html[data-theme-resolved="dark"] .quiz-choice-note-v141{
   </div>
 </section>
 
-
-<section class="page" id="pricing">
-  <header class="topbar">
-    <div class="title"><h2>Pricing</h2><p>Layanan Pricing sudah tidak tersedia.</p></div>
-  </header>
-  <div class="k7-pricing-closed" role="status" aria-live="polite">
-    <div class="k7pc-icon" aria-hidden="true"><i data-lucide="ban"></i></div>
-    <h3>Pricing Resmi Ditutup</h3>
-    <p>Fitur Pricing telah resmi ditutup pada <b>6 Oktober 2026</b>. Semua fitur sekarang tanpa batas, tidak perlu paket maupun pembayaran lagi.</p>
-    <span class="k7pc-note"><i data-lucide="infinity"></i> Semua fitur tanpa batas</span>
-    <button class="btn-link secondary k7pc-back" type="button" data-go="dashboard"><i data-lucide="arrow-left"></i> Kembali ke Ringkasan</button>
-  </div>
-</section>
 
 
 <section class="page" id="files">
@@ -26845,7 +26826,7 @@ setInterval(()=>{if(!document.hidden&&!$('#somModal')?.classList.contains('open'
     return nav?.dataset?.page||'dashboard';
   }
   function pageLabel(id){
-    const map={dashboard:'Ringkasan',finance:'Keuangan',learningSchool:'Belajar',files:'Files',notes:'Catatan',pricing:'Pricing',news:'Berita Kelas',announcements:'Pengumuman & Kalender',tasks:'Tugas & Piket',settings:'Pengaturan',documents:'Dokumen & Voting',officers:'Struktur Organisasi',classMap:'Denah Kelas',betaFeatures:'Fitur Kelas'};
+    const map={dashboard:'Ringkasan',finance:'Keuangan',learningSchool:'Belajar',files:'Files',notes:'Catatan',news:'Berita Kelas',announcements:'Pengumuman & Kalender',tasks:'Tugas & Piket',settings:'Pengaturan',documents:'Dokumen & Voting',officers:'Struktur Organisasi',classMap:'Denah Kelas',betaFeatures:'Fitur Kelas'};
     return map[id]||String(id||'Dashboard').replace(/([a-z])([A-Z])/g,'$1 $2');
   }
   function fillContext(){
@@ -28634,24 +28615,6 @@ html:root[data-theme-resolved="dark"] body .unsaved-notice-copy span{color:#fcd3
 })();
 
 </script>
-<style id="k7-pricing-closed-v153">
-/* ===== V153 · PRICING RESMI DITUTUP · SEMUA FITUR TANPA BATAS ===== */
-html:root body #pricing .k7-pricing-closed{max-width:560px;margin:8vh auto 0;padding:44px 32px 36px;text-align:center;border:1px solid var(--theme-line,#eadfd8);border-radius:24px;background:var(--theme-surface,#fff);box-shadow:var(--k7-shadow,0 10px 28px -12px rgba(16,24,40,.14))}
-html:root body #pricing .k7pc-icon{width:92px;height:92px;margin:0 auto 22px;border-radius:50%;display:grid;place-items:center;color:#dc2626;background:rgba(239,68,68,.10);border:2px solid rgba(239,68,68,.28)}
-html:root body #pricing .k7pc-icon svg{width:48px;height:48px;stroke-width:2.1}
-html:root body #pricing .k7-pricing-closed h3{margin:0 0 10px;font-size:24px;font-weight:800;letter-spacing:-.015em;color:var(--theme-text,#2a0a10)}
-html:root body #pricing .k7-pricing-closed p{margin:0 auto;max-width:440px;font-size:15px;line-height:1.65;color:var(--theme-muted,#6f6467)}
-html:root body #pricing .k7-pricing-closed p b{color:var(--theme-text,#2a0a10)}
-html:root body #pricing .k7pc-note{display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:700;color:#15803d;background:rgba(34,197,94,.12)}
-html:root body #pricing .k7pc-note svg{width:16px;height:16px}
-html:root body #pricing .k7pc-back{display:block;width:max-content;margin:22px auto 0}
-html:root[data-theme-resolved="dark"] body #pricing .k7pc-icon{color:#f87171;background:rgba(239,68,68,.16);border-color:rgba(248,113,113,.35)}
-html:root[data-theme-resolved="dark"] body #pricing .k7pc-note{color:#4ade80;background:rgba(34,197,94,.16)}
-/* tanpa paket: panel kuota/plan disembunyikan, warna aksen tidak terkunci */
-html:root body :is(.files-quota-panel,.files-plan-pill,.plan-accent-note,.k7-plan-ai-note,.quiz-plan-history,.telkom-host-plan-badge){display:none!important}
-html:root body .interface-color-choice.plan-locked{opacity:1!important;filter:none!important;pointer-events:auto!important}
-html:root body .interface-color-choice.plan-locked::after{display:none!important}
-</style>
 <script id="k7-unlimited-v153-js">
 /* V153: Pricing ditutup 6 Okt 2026 — semua akun tanpa batas plan */
 (()=>{
