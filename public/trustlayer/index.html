@@ -7,6 +7,7 @@
 <title>TrustLayer · OneClass.7MIT</title>
 <link rel="icon" href="/assets/logo-7mit.jpg">
 <link rel="stylesheet" href="/assets/design.7mit.css">
+<link rel="stylesheet" href="/assets/oneclass-motion.css">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <style>
 html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--ink)}
@@ -48,7 +49,7 @@ html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--in
     <div style="display:flex;gap:var(--space-2);flex-wrap:wrap"><a class="m7-btn m7-btn-secondary m7-btn-sm" id="back" href="/"><i data-lucide="arrow-left"></i>Kembali ke OneClass</a></div>
   </header>
 
-  <section class="tl-hero">
+  <section class="tl-hero oc-reveal">
     <span class="tl-eyebrow">Periksa · catat · tindak lanjuti</span>
     <h1>Server yang menegakkan.<br><em>Kami yang memastikan.</em></h1>
     <p>TrustLayer tidak memblokir akses. Server tetap menegakkan izin; TrustLayer memeriksa apakah keputusan akses, data, dan konfigurasi sudah sesuai aturan, lalu mencatat hasilnya untuk pengelola.</p>
@@ -88,6 +89,7 @@ html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--in
   </div>
 </div>
 <script src="/assets/config.js"></script>
+<script src="/assets/oneclass-motion.js"></script>
 <script src="/assets/oneclass-session.js"></script>
 <script>
 (function(){
@@ -146,7 +148,7 @@ document.addEventListener('click',async function(e){
 });
 $('run').addEventListener('click',async function(){
   var b=this;b.disabled=true;$('runT').textContent='Memeriksa…';
-  try{var r=await api({action:'run_checks'});st.counts=r.counts;stats();last(r.last_run);flash('Pemeriksaan selesai: '+r.passed+' berhasil, '+(r.access+r.data+r.config+r.connection)+' temuan baru (akses '+r.access+', data '+r.data+', konfigurasi '+r.config+', koneksi '+r.connection+').',(r.access+r.data+r.config+r.connection)?'warning':'success');await loadEvents()}
+  try{var r=await api({action:'run_checks'});st.counts=r.counts;stats();last(r.last_run);if(!(r.access+r.data+r.config+r.connection)&&window.OneClassMotion)window.OneClassMotion.confetti({y:.25,count:90});flash('Pemeriksaan selesai: '+r.passed+' berhasil, '+(r.access+r.data+r.config+r.connection)+' temuan baru (akses '+r.access+', data '+r.data+', konfigurasi '+r.config+', koneksi '+r.connection+').',(r.access+r.data+r.config+r.connection)?'warning':'success');await loadEvents()}
   catch(e){flash(e.message,'danger')}finally{b.disabled=false;$('runT').textContent='Jalankan pemeriksaan'}
 });
 window.addEventListener('load',icons);

@@ -8,6 +8,7 @@
 <title>OneClass.7MIT · Masuk</title>
 <link rel="icon" href="/assets/logo-7mit.jpg">
 <link rel="stylesheet" href="/assets/design.7mit.css">
+<link rel="stylesheet" href="/assets/oneclass-motion.css">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <style>
 html,body{margin:0;min-height:100%}
@@ -47,6 +48,18 @@ body{background:var(--surface);color:var(--ink)}
 .oc-role svg{width:18px;height:18px;flex:none}
 .oc-g{width:18px;height:18px;flex:none;display:block}
 .oc-forgot{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:2px;font-size:13px;font-weight:700;color:var(--maroon-soft-ink);text-decoration:none}.oc-forgot svg{width:15px;height:15px}.oc-forgot:hover{text-decoration:underline}.oc-forgot:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:4px}
+.oc-orb{position:absolute;border-radius:50%;filter:blur(46px);opacity:.55;pointer-events:none;animation:oc-float 11s ease-in-out infinite;transition:translate .5s var(--oc-ease)}
+.oc-orb.o1{width:340px;height:340px;left:-80px;top:22%;background:radial-gradient(circle,#c8344a,transparent 70%);--fx:26px;--fy:-30px}
+.oc-orb.o2{width:280px;height:280px;right:6%;top:52%;background:radial-gradient(circle,#e9b8a0,transparent 70%);opacity:.32;animation-duration:14s;--fx:-30px;--fy:24px}
+.oc-orb.o3{width:220px;height:220px;left:38%;bottom:-70px;background:radial-gradient(circle,#a01d2d,transparent 70%);animation-duration:9s;--fx:20px;--fy:-18px}
+.oc-watermark{transition:translate .6s var(--oc-ease)}
+.oc-rot{display:inline-block;color:var(--blush);min-width:5.4em;transition:opacity .35s ease,transform .35s var(--oc-ease)}
+.oc-rot.out{opacity:0;transform:translateY(-.6em)}.oc-rot.in{opacity:0;transform:translateY(.6em)}
+#heroTitle .ch{display:inline-block;animation:oc-char .7s var(--oc-spring) backwards;animation-delay:calc(var(--i)*55ms + .15s)}
+.oc-prog{height:4px;border-radius:99px;background:var(--surface-sunken);overflow:hidden}
+.oc-prog i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--maroon),var(--banner-1,#a01d2d));transition:width .6s var(--oc-ease)}
+html.oc-reduce .oc-orb,html.oc-reduce #heroTitle .ch{animation:none}
+@media (prefers-reduced-motion:reduce){.oc-orb,#heroTitle .ch{animation:none!important}}
 [hidden]{display:none!important}
 @media(max-width:880px){.oc{grid-template-columns:1fr}.oc-hero{padding:var(--space-8) var(--space-6);min-height:auto}.oc-hero h1{font-size:40px}.oc-watermark{font-size:300px}}
 @media (prefers-reduced-motion:reduce){.oc-steps li.run .oc-dot svg{animation:none}}
@@ -56,29 +69,30 @@ body{background:var(--surface);color:var(--ink)}
 <main class="oc">
   <section class="oc-hero m7-ground" aria-label="Tentang OneClass.7MIT">
     <div class="m7-frame"></div><div class="oc-watermark" aria-hidden="true">7</div>
-    <div class="m7-plate"><img src="/assets/logo-7mit.jpg" alt="7 MIT Kharisma Bangsa"></div>
+    <span class="oc-orb o1" aria-hidden="true"></span><span class="oc-orb o2" aria-hidden="true"></span><span class="oc-orb o3" aria-hidden="true"></span>
+    <div class="m7-plate oc-reveal"><img src="/assets/logo-7mit.jpg" alt="7 MIT Kharisma Bangsa"></div>
     <div class="oc-hero-body">
-      <span class="m7-eyebrow">Satu portal · tiga peran</span>
-      <h1 class="m7-h">OneClass<span class="m7-accent">.7MIT</span></h1>
-      <p class="m7-p">Siswa, guru, dan pengurus 7 MIT masuk di satu tempat. Tampilan dan kewenangan mengikuti peran akunmu di server.7mit.</p>
+      <span class="m7-eyebrow oc-reveal">Satu portal untuk <b class="oc-rot" id="rot" aria-live="off">siswa</b></span>
+      <h1 class="m7-h" id="heroTitle" aria-label="OneClass.7MIT">OneClass<span class="m7-accent">.7MIT</span></h1>
+      <p class="m7-p oc-reveal">Siswa, guru, dan pengurus 7 MIT masuk di satu tempat. Tampilan dan kewenangan mengikuti peran akunmu di server.7mit.</p>
     </div>
-    <div class="oc-pills"><span class="m7-pill m7-pill-dot">TrustLayer aktif</span><span class="m7-pill">Siswa · Guru · Pengurus</span></div>
+    <div class="oc-pills oc-reveal"><span class="m7-pill m7-pill-dot">TrustLayer aktif</span><span class="m7-pill">Siswa · Guru · Pengurus</span></div>
   </section>
 
   <section class="oc-form">
     <div class="m7-card oc-card" id="card">
       <div id="viewLogin" class="oc-stack">
-        <div><h2 class="m7-card-title">Masuk ke OneClass</h2><p class="m7-card-sub">Pakai username dan password akun.7mit.</p></div>
+        <div class="oc-reveal"><h2 class="m7-card-title">Masuk ke OneClass</h2><p class="m7-card-sub">Pakai username dan password akun.7mit.</p></div>
         <div class="m7-alert m7-alert-danger" id="err" role="alert" hidden><i data-lucide="circle-alert"></i><div><b id="errT">Gagal masuk</b><span id="errM"></span></div></div>
-        <form id="form" class="oc-stack" novalidate>
+        <form id="form" class="oc-stack oc-reveal" novalidate>
           <div class="m7-field"><label class="m7-label" for="u">Username</label><input class="m7-input" id="u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="contoh atau contoh@7mit" required><span class="m7-help">Boleh dengan atau tanpa @7mit.</span></div>
           <div class="m7-field"><label class="m7-label" for="p">Password</label><div class="oc-pw"><input class="m7-input" id="p" name="password" type="password" autocomplete="current-password" required><button type="button" class="m7-btn m7-btn-ghost m7-btn-sm" id="showPw" aria-pressed="false"><i data-lucide="eye"></i><span>Tampilkan</span></button></div><a class="oc-forgot" href="https://akun.7mit.org/forgot-pwd" target="_blank" rel="noopener noreferrer"><i data-lucide="key-round"></i>Lupa password?</a></div>
           <button class="m7-btn m7-btn-primary m7-btn-lg" id="go" type="submit"><i data-lucide="log-in"></i><span id="goT">Masuk</span></button>
         </form>
-        <div class="oc-sep">atau</div>
-        <button class="m7-btn m7-btn-secondary" id="google" type="button">
+        <div class="oc-sep oc-reveal">atau</div>
+        <button class="m7-btn m7-btn-secondary oc-shine oc-reveal" id="google" type="button">
           <img class="oc-g" src="/assets/google-g.png" alt="" width="18" height="18">Masuk dengan Google</button>
-        <p class="oc-foot">Belum punya akun? Daftar di <a href="https://akun.7mit.org" rel="noopener">akun.7mit.org</a>.</p>
+        <p class="oc-foot oc-reveal">Belum punya akun? Daftar di <a href="https://akun.7mit.org" rel="noopener">akun.7mit.org</a>.</p>
       </div>
 
       <div id="viewRoles" class="oc-stack" hidden>
@@ -95,6 +109,7 @@ body{background:var(--surface);color:var(--ink)}
           <li data-s="trust"><span class="oc-dot"></span><span>Pemeriksaan TrustLayer</span></li>
           <li data-s="open"><span class="oc-dot"></span><span>Membuka ruang kerja</span></li>
         </ol>
+        <div class="oc-prog" aria-hidden="true"><i id="prog"></i></div>
         <div class="m7-alert m7-alert-danger" id="err2" role="alert" hidden><i data-lucide="circle-alert"></i><div><b>Tidak bisa melanjutkan</b><span id="err2M"></span></div></div>
         <div id="stepsActions" hidden><button class="m7-btn m7-btn-secondary" id="stepsBack" type="button"><i data-lucide="arrow-left"></i>Kembali ke halaman masuk</button></div>
       </div>
@@ -102,6 +117,7 @@ body{background:var(--surface);color:var(--ink)}
   </section>
 </main>
 <script src="/assets/config.js"></script>
+<script src="/assets/oneclass-motion.js"></script>
 <script src="/assets/oneclass-session.js"></script>
 <script>
 (function(){
@@ -109,10 +125,12 @@ var C=window.ONECLASS_CONFIG,S=window.OneClassSession,$=function(i){return docum
 var pendingCreds=null;
 var LABEL={student:'Siswa',guru:'Guru',pengurus:'Pengurus'};
 function view(n){['viewLogin','viewRoles','viewSteps'].forEach(function(v){$(v).hidden=v!==n})}
-function showErr(t,m){$('errT').textContent=t;$('errM').textContent=m||'';$('err').hidden=false;icons()}
+function showErr(t,m){$('errT').textContent=t;$('errM').textContent=m||'';$('err').hidden=false;icons();var c=$('card');c.classList.remove('oc-shake');void c.offsetWidth;c.classList.add('oc-shake')}
 function hideErr(){$('err').hidden=true}
 function icons(){try{window.lucide&&window.lucide.createIcons()}catch(e){}}
-function step(name,state){var li=document.querySelector('#steps li[data-s="'+name+'"]');if(!li)return;li.className=state;var ic=state==='ok'?'check':state==='warn'?'triangle-alert':state==='run'?'loader-circle':'';li.querySelector('.oc-dot').innerHTML=ic?'<i data-lucide="'+ic+'"></i>':'';icons()}
+var ORDER=['auth','role','trust','open'];
+function progress(){var done=document.querySelectorAll('#steps li.ok,#steps li.warn').length;var p=$('prog');if(p)p.style.width=(done/ORDER.length*100)+'%'}
+function step(name,state){var li=document.querySelector('#steps li[data-s="'+name+'"]');if(!li)return;li.className=state;var ic=state==='ok'?'check':state==='warn'?'triangle-alert':state==='run'?'loader-circle':'';li.querySelector('.oc-dot').innerHTML=ic?'<i data-lucide="'+ic+'"></i>':'';icons();progress()}
 function resetSteps(){['auth','role','trust','open'].forEach(function(s){step(s,'')});$('err2').hidden=true;$('stepsActions').hidden=true}
 async function enter(token,profile,opts){
   opts=opts||{};view('viewSteps');resetSteps();
@@ -131,7 +149,8 @@ async function enter(token,profile,opts){
     $('stepsTitle').textContent='Halo, '+(profile.display_name||'selamat datang');
     $('stepsSub').textContent='Masuk sebagai '+LABEL[mode]+(profile.role&&profile.role!==LABEL[mode]?' · '+profile.role:'')+(tl?'':' (TrustLayer belum dapat dihubungi; server tetap menegakkan izin)');
     step('open','ok');
-    setTimeout(function(){location.replace(S.homeFor(mode))},opts.fast?150:650);
+    if(!opts.fast&&window.OneClassMotion)window.OneClassMotion.confetti({y:.3});
+    setTimeout(function(){location.replace(S.homeFor(mode))},opts.fast?150:1150);
   }catch(e){
     S.clear();$('err2M').textContent=String(e&&e.message||'Terjadi kesalahan.');$('err2').hidden=false;$('stepsActions').hidden=false;
   }
@@ -170,6 +189,21 @@ $('google').addEventListener('click',async function(){
   hideErr();var b=this;b.disabled=true;
   try{await S.startGoogle()}catch(e){showErr('Sign in with Google gagal dimulai',String(e&&e.message||''));b.disabled=false}
 });
+
+// ---- gerak: kata berganti, huruf judul muncul, orb mengikuti kursor, kartu bergetar saat galat, progres, konfeti
+(function(){
+  var M=window.OneClassMotion;if(!M)return;
+  var t=document.getElementById('heroTitle');
+  if(t&&!M.reduced()){var n=0,html='';[].forEach.call(t.childNodes,function(nd){var span=nd.nodeType===1,txt=nd.textContent;var inner=txt.split('').map(function(c){return '<span class="ch" style="--i:'+(n++)+'">'+c+'</span>'}).join('');html+=span?'<span class="'+nd.className+'">'+inner+'</span>':inner});t.innerHTML=html}
+  var words=['siswa','guru','pengurus'],rot=document.getElementById('rot'),wi=0;
+  if(rot&&!M.reduced())setInterval(function(){rot.classList.add('out');setTimeout(function(){wi=(wi+1)%words.length;rot.textContent=words[wi];rot.classList.remove('out');rot.classList.add('in');requestAnimationFrame(function(){requestAnimationFrame(function(){rot.classList.remove('in')})})},350)},2400);
+  var hero=document.querySelector('.oc-hero');
+  if(hero&&window.matchMedia('(hover:hover) and (pointer:fine)').matches)hero.addEventListener('pointermove',function(e){
+    if(M.reduced())return;var r=hero.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    hero.querySelectorAll('.oc-orb').forEach(function(o,i){var k=(i+1)*22;o.style.translate=(x*k)+'px '+(y*k)+'px'});
+    var w=hero.querySelector('.oc-watermark');if(w)w.style.translate=(-x*28)+'px '+(-y*28)+'px';
+  });
+})();
 window.addEventListener('load',icons);
 (async function boot(){
   var q=new URLSearchParams(location.search);

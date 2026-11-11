@@ -69,7 +69,7 @@ def patch(html, mode):
     html = sub1(r'(<meta charset="utf-8">)', lambda m: m.group(1) + '\n' + guard, html, 'meta charset', re.I)
     # 5. TrustLayer: konfigurasi, sesi bersama, dan klien pemeriksa
     html = sub1(r'</head>', '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,600;0,700;1,600;1,700&display=swap">\n</head>', html, 'head end')
-    tail = ('<link rel="stylesheet" href="/assets/oneclass-theme.css">\n<script src="/assets/config.js"></script>\n<script src="/assets/oneclass-session.js"></script>\n'
+    tail = ('<link rel="stylesheet" href="/assets/oneclass-theme.css">\n<link rel="stylesheet" href="/assets/oneclass-motion.css">\n<script src="/assets/oneclass-motion.js"></script>\n<script src="/assets/config.js"></script>\n<script src="/assets/oneclass-session.js"></script>\n'
             '<script src="/trustlayer/client.js" defer></script>\n')
     i = html.rindex('</body>')
     return html[:i] + tail + html[i:]
@@ -95,6 +95,7 @@ def main():
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copyfile('src/pages/' + src_page, dst)
     shutil.copyfile('src/theme/oneclass-theme.css', 'public/assets/oneclass-theme.css')
+    shutil.copyfile('src/theme/oneclass-motion.css', 'public/assets/oneclass-motion.css')
     os.system('python3 tools/design_css.py')
 
 if __name__ == '__main__':

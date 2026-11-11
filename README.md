@@ -47,6 +47,10 @@ Ruang kerja ikut tampilan yang sama lewat dua lapis:
 1. `tools/retheme.py` mengganti palet biru/slate portal lama menjadi palet design.7mit (marun, krem, abu hangat; tema Marun untuk mode gelap) di seluruh CSS dan JS.
 2. `src/theme/oneclass-theme.css` mengunci aksen ke marun, memakai Lora untuk judul dan Inter untuk isi, dan menyembunyikan pilihan warna interface.
 
+Gerak dan interaksi ada di `public/assets/oneclass-motion.{css,js}` (sumber CSS: `src/theme/`): muncul bertahap, angka naik, kartu miring mengikuti kursor,
+riak tombol, getar saat galat, orb dan judul animatif di halaman masuk, serta konfeti saat berhasil masuk. Semuanya mati otomatis jika perangkat memakai
+"kurangi gerak" (`prefers-reduced-motion`) atau mode hemat gerak di Pengaturan ruang kerja.
+
 Halaman login bawaan tiap portal (gerbang siswa dan akses) dihapus saat build; login hanya di `/`.
 Lupa password mengarah ke https://akun.7mit.org/forgot-pwd.
 

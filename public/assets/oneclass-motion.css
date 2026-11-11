@@ -1,0 +1,73 @@
+/* OneClass.7MIT — gerak dan interaksi. Semua gerak dimatikan oleh prefers-reduced-motion dan html.oc-reduce / html.k7-reduce. */
+:root{--oc-ease:cubic-bezier(.2,.7,.2,1);--oc-spring:cubic-bezier(.34,1.56,.64,1)}
+
+/* ---------- muncul bertahap (halaman baru: masuk, callback, TrustLayer) ---------- */
+html.oc-js:not(.oc-reduce) .oc-rv:not(.oc-in){opacity:0;transform:translateY(16px)}
+html.oc-js:not(.oc-reduce) .oc-rv.oc-in{animation:oc-rise .6s var(--oc-ease) backwards;animation-delay:var(--oc-d,0s)}
+@keyframes oc-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes oc-fade{from{opacity:0}to{opacity:1}}
+@keyframes oc-pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:none}}
+@keyframes oc-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+@keyframes oc-float{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(var(--fx,16px),var(--fy,-22px),0) scale(1.06)}}
+@keyframes oc-sheen{from{transform:translateX(-120%) skewX(-18deg)}to{transform:translateX(260%) skewX(-18deg)}}
+@keyframes oc-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes oc-char{from{opacity:0;transform:translateY(.55em) rotate(4deg)}to{opacity:1;transform:none}}
+@keyframes oc-draw{from{stroke-dashoffset:var(--len,60)}to{stroke-dashoffset:0}}
+.oc-shake{animation:oc-shake .5s var(--oc-ease)}
+
+/* ---------- kartu: angkat + bayangan + miring mengikuti kursor ---------- */
+@media (hover:hover) and (pointer:fine){
+  html:not(.oc-reduce) .m7-card:not(.oc-static),html:not(.oc-reduce) .m7-stat,html:not(.oc-reduce) .m7-li,html:not(.oc-reduce) .tl-item,
+  html:not(.oc-reduce) .stat,html:not(.oc-reduce) .summary-box,html:not(.oc-reduce) .list-card{transition:transform .28s var(--oc-ease),box-shadow .28s var(--oc-ease),border-color .28s ease,background-color .28s ease}
+  html:not(.oc-reduce) .m7-stat:hover,html:not(.oc-reduce) .stat:hover,html:not(.oc-reduce) .summary-box:hover{transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-4px);box-shadow:0 18px 40px rgba(42,10,16,.18)}
+  html:not(.oc-reduce) .m7-li:hover,html:not(.oc-reduce) .tl-item:hover,html:not(.oc-reduce) .list-card:hover{transform:translateX(4px);border-color:var(--maroon,#7a1424)}
+}
+
+/* ---------- tombol: tekan, kilau, panah bergeser ---------- */
+html:not(.oc-reduce) .m7-btn,html:not(.oc-reduce) .btn,html:not(.oc-reduce) .mini-btn{transition:transform .18s var(--oc-ease),box-shadow .25s ease,background-color .2s ease,border-color .2s ease,color .2s ease}
+html:not(.oc-reduce) .m7-btn:active,html:not(.oc-reduce) .btn:active,html:not(.oc-reduce) .mini-btn:active{transform:scale(.96)}
+@media (hover:hover){html:not(.oc-reduce) .m7-btn:hover:not(:disabled){transform:translateY(-2px)}}
+.m7-btn{position:relative;overflow:hidden;isolation:isolate}
+.m7-btn-primary::after,.m7-btn-secondary.oc-shine::after{content:"";position:absolute;inset:0 auto 0 0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:translateX(-120%) skewX(-18deg);pointer-events:none}
+@media (hover:hover){html:not(.oc-reduce) .m7-btn-primary:hover::after,html:not(.oc-reduce) .m7-btn-secondary.oc-shine:hover::after{animation:oc-sheen .8s var(--oc-ease)}}
+.m7-btn svg{transition:transform .25s var(--oc-spring)}
+@media (hover:hover){html:not(.oc-reduce) .m7-btn:hover svg[class*="arrow-right"],html:not(.oc-reduce) .m7-btn:hover svg[class*="log-in"]{transform:translateX(4px)}html:not(.oc-reduce) .m7-btn:hover svg[class*="play"]{transform:scale(1.25)}html:not(.oc-reduce) .m7-btn:hover svg[class*="arrow-left"]{transform:translateX(-4px)}}
+.oc-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:oc-ripple .6s ease-out forwards;pointer-events:none}
+.m7-btn-secondary .oc-ripple,.m7-btn-ghost .oc-ripple{background:rgba(122,20,36,.18)}
+@keyframes oc-ripple{to{transform:scale(1);opacity:0}}
+
+/* ---------- isian ---------- */
+html:not(.oc-reduce) .m7-input{transition:border-color .2s ease,background-color .2s ease,box-shadow .25s ease,transform .2s var(--oc-ease)}
+html:not(.oc-reduce) .m7-input:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--maroon,#7a1424) 18%,transparent);transform:translateY(-1px)}
+html:not(.oc-reduce) .m7-field:focus-within .m7-label{color:var(--maroon-soft-ink,#7a1424)}
+.m7-label{transition:color .2s ease,letter-spacing .25s var(--oc-ease)}
+.m7-field:focus-within .m7-label{letter-spacing:.16em}
+
+/* ---------- lencana, bar, ikon ---------- */
+html:not(.oc-reduce) .m7-badge{animation:oc-pop .45s var(--oc-spring) backwards}
+html:not(.oc-reduce) .m7-bar>i{transform-origin:left;animation:oc-grow 1s var(--oc-ease) backwards}
+html:not(.oc-reduce) .m7-alert{animation:oc-rise .45s var(--oc-ease) backwards}
+html:not(.oc-reduce) .m7-tab{transition:background-color .2s ease,color .2s ease,border-color .2s ease,transform .2s var(--oc-spring)}
+html:not(.oc-reduce) .m7-tab:active{transform:scale(.92)}
+html:not(.oc-reduce) .m7-tab[aria-selected="true"]{animation:oc-pop .35s var(--oc-spring)}
+
+/* ---------- ruang kerja: kartu ringkasan, menu, ikon ---------- */
+@media (hover:hover) and (pointer:fine){
+  html:not(.oc-reduce):not(.k7-reduce) .nav button:hover .nav-icon{transform:scale(1.18) rotate(-6deg)}
+  html:not(.oc-reduce):not(.k7-reduce) .nav button:hover{transform:translateX(3px)}
+  html:not(.oc-reduce):not(.k7-reduce) .panel{transition:box-shadow .3s ease,border-color .3s ease}
+  html:not(.oc-reduce):not(.k7-reduce) .panel:hover{box-shadow:0 14px 36px rgba(42,10,16,.12);border-color:color-mix(in srgb,var(--accent-primary,#7a1424) 28%,var(--line,#eadfd8))}
+}
+html:not(.oc-reduce):not(.k7-reduce) .stat-value,html:not(.oc-reduce):not(.k7-reduce) .money{font-variant-numeric:tabular-nums}
+html:not(.oc-reduce):not(.k7-reduce) .mini-btn:hover{transform:translateY(-2px)}
+
+/* ---------- konfeti ---------- */
+.oc-confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99999}
+
+@media (prefers-reduced-motion:reduce){
+  html.oc-js .oc-rv:not(.oc-in){opacity:1!important;transform:none!important}
+  .oc-rv,.m7-badge,.m7-alert,.m7-bar>i,.oc-shake{animation:none!important}
+  *{scroll-behavior:auto!important}
+}
+html.oc-reduce .oc-rv{opacity:1!important;transform:none!important;animation:none!important}
+html.oc-reduce .m7-badge,html.oc-reduce .m7-alert,html.oc-reduce .m7-bar>i{animation:none!important}

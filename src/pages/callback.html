@@ -8,6 +8,7 @@
 <title>Masuk dengan Google · OneClass.7MIT</title>
 <link rel="icon" href="/assets/logo-7mit.jpg">
 <link rel="stylesheet" href="/assets/design.7mit.css">
+<link rel="stylesheet" href="/assets/oneclass-motion.css">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <style>
 html,body{margin:0;min-height:100%}body{background:var(--surface);color:var(--ink)}
@@ -25,6 +26,7 @@ main{min-height:100vh;display:grid;place-items:center;padding:var(--space-6)}
 .steps li.warn .dot{background:var(--warning-soft);border-color:var(--warning-ink);color:var(--warning-ink)}
 .steps li.err{color:var(--ink)}.steps li.err .dot{background:var(--danger-soft);border-color:var(--danger-ink);color:var(--danger-ink)}
 @keyframes spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.steps li.run .dot svg{animation:none}}
+.prog{height:4px;border-radius:99px;background:var(--surface-sunken);overflow:hidden}.prog i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--maroon),var(--banner-1,#a01d2d));transition:width .6s var(--oc-ease)}
 .roles{display:flex;flex-direction:column;gap:var(--space-2)}
 .role{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);width:100%;text-align:left;min-height:56px;padding:var(--space-3) var(--space-4);border:1.5px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface-raised);color:var(--ink);font:700 15px var(--font-sans);cursor:pointer}
 .role small{display:block;font-weight:400;color:var(--ink-muted);margin-top:2px}.role:hover{border-color:var(--maroon);background:var(--maroon-soft)}.role:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
@@ -40,19 +42,21 @@ main{min-height:100vh;display:grid;place-items:center;padding:var(--space-6)}
     <li data-s="trust"><span class="dot"></span><span>Pemeriksaan TrustLayer</span></li>
     <li data-s="open"><span class="dot"></span><span>Membuka ruang kerja</span></li>
   </ol>
+  <div class="prog" aria-hidden="true"><i id="prog"></i></div>
   <div class="m7-alert m7-alert-danger" id="err" role="alert" hidden><i data-lucide="circle-alert"></i><div><b id="errT">Masuk dengan Google gagal</b><span id="errM"></span></div></div>
   <div class="m7-alert m7-alert-warning" id="warn" role="status" hidden><i data-lucide="triangle-alert"></i><div><b id="warnT"></b><span id="warnM"></span></div></div>
   <div class="roles" id="roles" hidden></div>
   <div class="row" id="a" hidden></div>
 </section></main>
 <script src="/assets/config.js"></script>
+<script src="/assets/oneclass-motion.js"></script>
 <script src="/assets/oneclass-session.js"></script>
 <script>
 (function(){
 var S=window.OneClassSession,C=window.ONECLASS_CONFIG,$=function(i){return document.getElementById(i)};
 var LABEL={student:'Siswa',guru:'Guru',pengurus:'Pengurus'};
 function icons(){try{window.lucide&&window.lucide.createIcons()}catch(e){}}
-function step(name,state){var li=document.querySelector('#steps li[data-s="'+name+'"]');if(!li)return;li.className=state;var ic=state==='ok'?'check':state==='warn'?'triangle-alert':state==='err'?'x':state==='run'?'loader-circle':'';li.querySelector('.dot').innerHTML=ic?'<i data-lucide="'+ic+'"></i>':'';icons()}
+function step(name,state){var li=document.querySelector('#steps li[data-s="'+name+'"]');if(!li)return;li.className=state;var ic=state==='ok'?'check':state==='warn'?'triangle-alert':state==='err'?'x':state==='run'?'loader-circle':'';li.querySelector('.dot').innerHTML=ic?'<i data-lucide="'+ic+'"></i>':'';icons();var d=document.querySelectorAll('#steps li.ok,#steps li.warn').length,pb=$('prog');if(pb)pb.style.width=(d/4*100)+'%'}
 function actions(list){var a=$('a');a.innerHTML='';a.hidden=!(list&&list.length);(list||[]).forEach(function(x){var l=document.createElement('a');l.className='m7-btn '+(x.alt?'m7-btn-secondary':'m7-btn-primary');l.href=x.href;l.innerHTML='<i data-lucide="'+(x.icon||'arrow-left')+'"></i>';l.appendChild(document.createTextNode(x.label));a.appendChild(l)});icons()}
 function clean(){try{history.replaceState(null,'',location.pathname)}catch(e){}}
 function done(){try{sessionStorage.removeItem(S.INTENT)}catch(e){}}
@@ -70,7 +74,8 @@ async function finish(client,data){
   $('t').textContent='Halo, '+(data.profile.display_name||'selamat datang');
   $('m').textContent='Masuk sebagai '+LABEL[mode]+(data.profile.role&&data.profile.role!==LABEL[mode]?' · '+data.profile.role:'')+(tl?'':' (TrustLayer belum dapat dihubungi; server tetap menegakkan izin)');
   step('open','ok');
-  setTimeout(function(){location.replace(S.homeFor(mode))},650);
+  if(window.OneClassMotion)window.OneClassMotion.confetti({y:.3});
+  setTimeout(function(){location.replace(S.homeFor(mode))},1150);
 }
 async function run(){
   step('auth','run');
