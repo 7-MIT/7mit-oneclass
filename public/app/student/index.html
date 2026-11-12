@@ -29256,7 +29256,7 @@ function applyLabels(){
   const mgr=!d||d.can_manage;
   const tab=$('[data-trk-tab="quran"]');if(tab)tab.innerHTML='<i data-lucide="book-marked"></i> Quran';
   const sub=$('#trkBookSub');if(sub)sub.textContent=mgr?'Catat bacaan buku dan Quran (Quran Reading & Quran Memorization) setiap siswa dalam satu semester.':'Catat bacaan buku dan Quran milikmu dalam satu semester.';
-  const asub=$('#trkAchSub');if(asub&&store.achievement.data)asub.textContent=mgr?`Pantau pemenuhan minimal ${store.achievement.data.target.target} kompetisi untuk setiap siswa dalam satu semester.`:`Catat kompetisi yang kamu ikuti. Targetmu minimal ${store.achievement.data.target.target} kompetisi per semester.`;
+  const asub=$('#trkAchSub');if(asub&&store.achievement.data){const tg=store.achievement.data.target?.target??"—";asub.textContent=mgr?`Pantau pemenuhan minimal ${tg} kompetisi untuk setiap siswa dalam satu semester.`:`Catat kompetisi yang kamu ikuti. Targetmu minimal ${tg} kompetisi per semester.`}
 }
 function render(kind){
   const d=store[kind].data;if(!d)return;
@@ -30161,6 +30161,20 @@ document.addEventListener("click",event=>{
 if(root.classList.contains("active"))init();
 })();
 </script>
+<style id="k7PolishV1">
+/* Perapian lintas halaman: kontras mode gelap, sasaran sentuh, fokus keyboard, dan toolbar seluler. */
+html:is([data-theme-resolved="dark"],[data-theme="dark"]) body :is(.readonly-note,.k7-moderation-ai-chip,.ls-system-kicker,.doc-view-btn-v85.active){color:var(--maroon-soft-ink,#ffe3d2)!important}
+html:is([data-theme-resolved="dark"],[data-theme="dark"]) body :is(#officers,#modal,.modal,body) .job-tasks.job-tasks li{background:var(--surface-raised,#55101b)!important;border-color:var(--line,#6b2733)!important;color:var(--ink,#fff4ee)!important}
+html:is([data-theme-resolved="dark"],[data-theme="dark"]) body #officers .org-member-list.org-member-list li{background:var(--surface-sunken,#2b070d)!important;border-color:var(--line,#6b2733)!important;color:var(--ink,#fff4ee)!important}
+html:is([data-theme-resolved="dark"],[data-theme="dark"]) body :is(#officers,#modal,.modal,body) .jobdesc-toggle.jobdesc-toggle{background:var(--surface-sunken,#2b070d)!important;border-color:var(--line,#6b2733)!important}
+html:root body :is(button,a,[role=button],input,select,textarea,summary):focus-visible{outline:2px solid var(--focus-ring,#7a1424)!important;outline-offset:2px}
+@media(max-width:700px){
+  html:root body .agenda-calendar-toolbar,html:root body .agenda-calendar-legend{position:sticky;left:0;min-width:0;width:calc(100vw - 44px);max-width:100%;box-sizing:border-box}
+  .agenda-calendar-nav{flex-wrap:wrap}
+  html:root body .mini-btn{min-width:36px;min-height:36px}
+}
+@media(prefers-reduced-motion:reduce){html:root body *,html:root body *::before,html:root body *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
 <link rel="stylesheet" href="/assets/oneclass-theme.css">
 <link rel="stylesheet" href="/assets/oneclass-motion.css">
 <script src="/assets/oneclass-motion.js"></script>
