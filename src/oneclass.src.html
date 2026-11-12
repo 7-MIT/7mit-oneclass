@@ -14892,6 +14892,7 @@ window.supabase={createClient:(u,k)=>new S(u,k)};
   }
     const FIXED_TIMETABLE = {};
   const TIMETABLE_TEACHERS = {};
+  const TIMETABLE_DETAIL = {};
   /* ===== Jadwal dari server (kelas7mit_schedule): mengisi ulang tabel waktu di tempat ===== */
   function k7ApplyServerTimetable(snap){
     const rows=Array.isArray(snap?.sisSchedule)?snap.sisSchedule:[],per=Array.isArray(snap?.schedulePeriods)?snap.schedulePeriods:[];
@@ -14899,16 +14900,17 @@ window.supabase={createClient:(u,k)=>new S(u,k)};
     const days=["Senin","Selasa","Rabu","Kamis","Jumat"];
     const slot=(d,k)=>per.find(p=>p.day===d&&p.period===k)||per.find(p=>p.day==="*"&&p.period===k)||null;
     const mins=t=>{const m=/^(\d{1,2}):(\d{2})$/.exec(t||"");return m?(+m[1])*60+(+m[2]):null};
-    [PERIODS_BY_DAY,DAY_ACTIVITIES,FIXED_TIMETABLE,TIMETABLE_TEACHERS].forEach(o=>Object.keys(o).forEach(k=>delete o[k]));
+    [PERIODS_BY_DAY,DAY_ACTIVITIES,FIXED_TIMETABLE,TIMETABLE_TEACHERS,TIMETABLE_DETAIL].forEach(o=>Object.keys(o).forEach(k=>delete o[k]));
     const startOf=(r,k)=>r.startsAt||slot(r.day,k)?.startsAt||"",endOf=(r,k)=>r.endsAt||slot(r.day,k)?.endsAt||"";
     days.forEach(day=>{
       const mine=rows.filter(r=>r.day===day).sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
       if(!mine.length)return;
-      const lessons=[],subjects=[];
+      const lessons=[],subjects=[],detail=[];
       for(let n=1;n<=8;n++){
         const sl=slot(day,String(n));if(!sl)continue;
         const cover=mine.find(r=>(Number(r.periodStart??r.period)||0)<=n&&n<=(Number(r.periodEnd??r.periodStart??r.period)||0));
         lessons.push({number:n,start:sl.startsAt,end:sl.endsAt});subjects.push(cover?.subject||"—");
+        detail.push(mine.filter(r=>(Number(r.periodStart??r.period)||0)<=n&&n<=(Number(r.periodEnd??r.periodStart??r.period)||0)&&r.subject===cover?.subject));
       }
       if(!lessons.length)return;
       const acts=[];
@@ -14930,7 +14932,7 @@ window.supabase={createClient:(u,k)=>new S(u,k)};
         acts.push({label:gap>=10?"Break":"Short Break",start:edges[i][1],end:edges[i+1][0],kind:gap>=10?"break":"short"});
       }
       acts.sort((a,b)=>(mins(a.start)||0)-(mins(b.start)||0));
-      PERIODS_BY_DAY[day]=lessons;FIXED_TIMETABLE[day]=subjects;DAY_ACTIVITIES[day]=acts;
+      PERIODS_BY_DAY[day]=lessons;FIXED_TIMETABLE[day]=subjects;DAY_ACTIVITIES[day]=acts;TIMETABLE_DETAIL[day]=detail;
     });
     const by={};
     rows.forEach(r=>{const w=r.teacherName||r.teacherCode;if(!w)return;(by[r.subject]=by[r.subject]||new Set()).add(w)});
@@ -17039,7 +17041,10 @@ function setCurrentLessonSubject(value){
       const nextActivity=activities.find(item=>toSeconds(item.start)>=toSeconds(period.end));
 
       setCurrentLessonSubject(subject);
-      $("#currentDetail").textContent=`${day} · Jadwal tetap Kelas 7 MIT`;
+      const nowRows=(TIMETABLE_DETAIL[day]||[])[activePeriodIndex]||[];
+      const info=nowRows.map(r=>[r.group,r.teacherName||r.teacherCode,r.room].filter(Boolean).join(" · ")).filter(Boolean).join("  |  ");
+      $("#currentDetail").textContent=`${day} · ${info||"Jadwal Kelas 7 MIT"}`;
+      $("#currentDetail").title="Sumber: tabel kelas7mit_schedule";
       $("#currentPeriod").textContent=`Period ${period.number}`;
       $("#currentTime").textContent=`${period.start}–${period.end} WIB`;
       $("#currentNext").textContent=period.number<8
@@ -21571,16 +21576,135 @@ function renderLsSchedule(){
       out+=`<div class="k7sch-li${live(r)?" is-live":""}" style="--h:${hue(r.subject)}"><div class="k7sch-lt"><b>${ps===pe?"Jam "+ps:"Jam "+ps+"–"+pe}</b><small>${X(t.text)}</small></div><div class="k7sch-lb"><b>${X(r.subject)}${r.group?` <em>${X(r.group)}</em>`:""}</b><small>${X([r.room,r.teacherCode].filter(Boolean).join(" · "))}${r.note?" · "+X(r.note):""}</small></div>${actions(r)}</div>`});
     return `<section class="k7sch-ld${day===today?" is-today":""}"><h4>${X(day)}${day===today?" <em>Hari ini</em>":""}</h4>${out||'<div class="k7sch-brk">Belum ada jadwal</div>'}</section>`}).join("");
   const diffs=per.filter(p=>p.day!=="*").map(p=>`${X(p.day)}: ${p.kind==="lesson"?"Jam ke-"+X(p.period):X(p.label||"Istirahat")} ${X(p.startsAt)}–${X(p.endsAt)}`);
-  return `<div class="ls-toolbar"><div class="ls-toolbar-copy"><b>Jadwal Pelajaran</b><small>Tabel: kelas7mit_schedule · ${rows.length} sesi</small></div>${edit?`<div class="ls-actions"><button class="ls-action primary" data-ls-add="schedule"><i data-lucide="plus"></i>Tambah Jadwal</button></div>`:""}</div>
+  return `<div class="ls-toolbar"><div class="ls-toolbar-copy"><b>Jadwal Pelajaran</b><small>Tabel: kelas7mit_schedule · ${rows.length} sesi</small></div><div class="ls-actions" role="group" aria-label="Ekspor jadwal"><button class="ls-action" data-k7sch-export="pdf" title="Unduh jadwal sebagai PDF"><i data-lucide="file-text"></i>PDF</button><button class="ls-action" data-k7sch-export="png" title="Unduh jadwal sebagai PNG"><i data-lucide="image"></i>PNG</button><button class="ls-action" data-k7sch-export="jpg" title="Unduh jadwal sebagai JPG"><i data-lucide="file-image"></i>JPG</button>${edit?`<button class="ls-action primary" data-ls-add="schedule"><i data-lucide="plus"></i>Tambah Jadwal</button>`:""}</div></div>
   <div class="k7sch-wrap"><div class="k7sch-grid">${head}${grid}${lunch}</div></div>
   <div class="k7sch-list">${list}</div>
   ${diffs.length?`<p class="k7sch-note">Jadwal khusus: ${diffs.join(" · ")}</p>`:""}`
 }
+/* ===== Ekspor Jadwal Pelajaran (kelas7mit_schedule) → PDF / PNG / JPG · tampilan design.7mit ===== */
+async function k7SchExport(format,btn){
+  const fmt=String(format||"png").toLowerCase();
+  const rows=lsRows("sisSchedule"),per=lsRows("schedulePeriods");
+  if(!rows.length){toast("Jadwal belum tersedia dari server.");return}
+  const old=btn?btn.innerHTML:"";if(btn){btn.disabled=true;btn.textContent="Menyiapkan…"}
+  try{
+    try{await Promise.all([document.fonts.load('700 60px Lora'),document.fonts.load('600 30px Inter'),document.fonts.load('700 30px Inter')])}catch(_){}
+    const logo=await new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src="/assets/logo-7mit.jpg"});
+    const canvas=k7SchPoster(rows,per,logo);
+    const stamp=new Date(Date.now()+7*3600000).toISOString().slice(0,10),name=`jadwal-pelajaran-kelas7mit-${stamp}`;
+    const save=(blob,ext)=>{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`${name}.${ext}`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)};
+    const toBlob=(type,q)=>new Promise(res=>canvas.toBlob(res,type,q));
+    if(fmt==="png")save(await toBlob("image/png"),"png");
+    else if(fmt==="jpg"||fmt==="jpeg")save(await toBlob("image/jpeg",0.93),"jpg");
+    else{const jpg=new Uint8Array(await (await toBlob("image/jpeg",0.95)).arrayBuffer());save(new Blob([k7JpegToPdf(jpg,canvas.width,canvas.height)],{type:"application/pdf"}),"pdf")}
+    toast(`Jadwal diekspor sebagai ${fmt.toUpperCase()}.`);
+  }catch(error){console.error(error);toast("Ekspor gagal: "+(error?.message||error))}
+  finally{if(btn){btn.disabled=false;btn.innerHTML=old;try{lucide?.createIcons?.({nodes:[btn]})}catch(_){}}}
+}
+function k7SchPoster(rows,per,logo){
+  const W=2480,H=1754,M=90,days=["Senin","Selasa","Rabu","Kamis","Jumat"];
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+  const C={surface:"#fbf8f4",raised:"#ffffff",line:"#eadfd8",ink:"#2a0a10",muted:"#6f6467",maroon:"#7a1424"};
+  const TINT=[["#f3e3d6","#7a1424"],["#dbe8fa","#1d4f91"],["#dcf3e4","#14653a"],["#fdecc8","#7a4205"],["#fde4e7","#9f1228"],["#ffe3d2","#a01d2d"]];
+  const tintOf=s=>{let h=0;for(const c of String(s||""))h=(h*31+c.charCodeAt(0))%TINT.length;return TINT[h]};
+  const SANS='Inter, system-ui, sans-serif',SERIF='Lora, Georgia, serif';
+  const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()};
+  const wrap=(text,maxW,font)=>{g.font=font;const words=String(text||"").split(/\s+/),lines=[];let cur="";for(const w of words){const t=cur?cur+" "+w:w;if(g.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t}if(cur)lines.push(cur);return lines};
+  const fit=(text,maxW,font)=>{g.font=font;let t=String(text||"");if(g.measureText(t).width<=maxW)return t;while(t.length>1&&g.measureText(t+"…").width>maxW)t=t.slice(0,-1);return t+"…"};
+  g.fillStyle=C.surface;g.fillRect(0,0,W,H);
+  // banner
+  const bg=g.createLinearGradient(0,0,W,300);bg.addColorStop(0,"#a01d2d");bg.addColorStop(0.6,"#7a1424");bg.addColorStop(1,"#3a0a12");g.fillStyle=bg;g.fillRect(0,0,W,290);
+  g.save();g.globalAlpha=0.07;g.fillStyle="#fff";g.font=`700 520px ${SERIF}`;g.textAlign="right";g.fillText("7",W-40,420);g.restore();
+  g.fillStyle="#fff";rr(M,62,330,166,28);g.fill();
+  if(logo){const s=Math.min(290/logo.width,126/logo.height);g.drawImage(logo,M+(330-logo.width*s)/2,62+(166-logo.height*s)/2,logo.width*s,logo.height*s)}
+  g.textAlign="left";g.fillStyle="#fff";g.font=`700 96px ${SERIF}`;g.fillText("Jadwal Pelajaran",M+390,148);
+  g.fillStyle="#fff2eb";g.font=`500 40px ${SANS}`;g.fillText("Kelas 7 MIT · Kharisma Bangsa",M+394,206);
+  const nowW=new Date(Date.now()+7*3600000),dateTxt=new Intl.DateTimeFormat("id-ID",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"}).format(nowW);
+  g.textAlign="right";g.fillStyle="#f6d7c4";g.font=`600 26px ${SANS}`;g.fillText("DIPERBARUI",W-M,118);g.fillStyle="#fff";g.font=`700 42px ${SANS}`;g.fillText(dateTxt,W-M,168);g.fillStyle="#f6d7c4";g.font=`600 28px ${SANS}`;g.fillText("OneClass.7MIT",W-M,214);
+  // grid geometry
+  const keys=["0","1","2","3","4","5","6","Lunch","7","8"],dayW=220,gx=M,gy=340,headH=128,footH=250;
+  const avail=W-2*M-dayW,wOf=k=>k==="0"?200:k==="Lunch"?150:(avail-350)/8;
+  const xOf={};let x=gx+dayW;for(const k of keys){xOf[k]=x;x+=wOf(k)}
+  const rowH=Math.floor((H-gy-headH-footH)/5),slot=(day,k)=>per.find(p=>p.day===day&&p.period===k)||per.find(p=>p.day==="*"&&p.period===k)||null;
+  const base=k=>per.find(p=>p.day==="*"&&p.period===k)||{startsAt:"",endsAt:"",label:k};
+  // header
+  g.fillStyle=C.maroon;rr(gx,gy,W-2*M,headH,26);g.fill();
+  g.textAlign="center";g.fillStyle="#fff";
+  g.font=`700 30px ${SANS}`;g.fillText("HARI",gx+dayW/2,gy+headH/2+10);
+  for(const k of keys){const b=base(k),cx=xOf[k]+wOf(k)/2;
+    g.fillStyle="#fff";g.font=`700 ${k==="Lunch"?26:32}px ${SANS}`;g.fillText(k==="Lunch"?"LUNCH":k==="0"?"Pagi":"Jam "+k,cx,gy+54);
+    g.fillStyle="#f6d7c4";g.font=`500 24px ${SANS}`;g.fillText(b.startsAt?`${b.startsAt}–${b.endsAt}`:"",cx,gy+96)}
+  // rows
+  const top=gy+headH+14;
+  days.forEach((day,i)=>{const y=top+i*rowH;
+    g.fillStyle=i%2?"#fff":"#fdfaf6";rr(gx,y,W-2*M,rowH-10,22);g.fill();g.strokeStyle=C.line;g.lineWidth=2;g.stroke();
+    g.fillStyle=C.maroon;g.textAlign="left";g.font=`700 46px ${SERIF}`;g.fillText(day,gx+28,y+(rowH-10)/2+4);
+    g.fillStyle=C.muted;g.font=`500 24px ${SANS}`;g.fillText(day==="Jumat"?"Sholat 11:50":"",gx+28,y+(rowH-10)/2+40);
+    const mine=rows.filter(r=>r.day===day),groups=new Map();
+    mine.forEach(r=>{const ps=Number(r.periodStart??r.period)||0,pe=Number(r.periodEnd??ps)||ps,key=ps+"-"+pe;(groups.get(key)||groups.set(key,[]).get(key)).push(r)});
+    for(const list of groups.values()){
+      const f=list[0],ps=Number(f.periodStart??f.period)||0,pe=Number(f.periodEnd??ps)||ps;
+      const a=xOf[String(ps)],b=xOf[String(pe)]+wOf(String(pe));if(a===undefined||b===undefined)continue;
+      const cx=a+6,cy=y+8,cw=b-a-12,ch=rowH-26,[bgc,fg]=tintOf(f.subject);
+      g.fillStyle=bgc;rr(cx,cy,cw,ch,18);g.fill();g.fillStyle=fg;rr(cx,cy+14,7,ch-28,4);g.fill();
+      g.textAlign="left";const tx=cx+22,tw=cw-34;
+      const multi=list.length>1;
+      const label=ps===0?(/dear/i.test(f.subject)?"DEAR Time":f.subject):f.subject;
+      g.fillStyle=C.ink;
+      const lines=wrap(label,tw,`700 ${multi?28:31}px ${SANS}`).slice(0,multi?2:3);
+      g.font=`700 ${multi?28:31}px ${SANS}`;let ty=cy+44;lines.forEach(l=>{g.fillText(l,tx,ty);ty+=multi?32:36});
+      if(!multi){
+        g.fillStyle=C.muted;g.font=`500 24px ${SANS}`;
+        const who=f.teacherName||f.teacherCode||"";
+        if(who){wrap(who,tw,`500 24px ${SANS}`).slice(0,2).forEach(l=>{g.fillText(l,tx,ty+4);ty+=28})}
+        const st=f.startsAt?`${f.startsAt}–${f.endsAt}`:"";
+        const meta=ps===0?st:[f.room,st].filter(Boolean).join(" · ");if(meta)g.fillText(fit(meta,tw,`500 24px ${SANS}`),tx,Math.min(ty+4,cy+ch-14));
+      }else{
+        const cols=cw>380?2:1,chipW=(tw-(cols-1)*10)/cols,chipH=34;let n=0;
+        for(const r of list){const col=n%cols,row=Math.floor(n/cols),px=tx+col*(chipW+10),py=ty-18+row*(chipH+6);if(py+chipH>cy+ch-6)break;
+          g.fillStyle="#fff";rr(px,py,chipW,chipH,12);g.fill();g.fillStyle=fg;g.font=`700 19px ${SANS}`;
+          g.fillText(fit([r.group,r.room].filter(Boolean).join(" · "),chipW-16,`700 19px ${SANS}`),px+9,py+24);n++}
+      }
+    }
+  });
+  // lunch band
+  const lx=xOf.Lunch,ly=top,lh=rowH*5-10;g.fillStyle="#fdecc8";rr(lx+6,ly,wOf("Lunch")-12,lh,22);g.fill();
+  g.save();g.translate(lx+wOf("Lunch")/2+10,ly+lh/2);g.rotate(-Math.PI/2);g.textAlign="center";g.fillStyle="#7a4205";g.font=`700 38px ${SANS}`;g.fillText("ISTIRAHAT · LUNCH",0,0);g.restore();
+  // footer
+  const fy=H-footH+30;g.strokeStyle=C.line;g.lineWidth=2;g.beginPath();g.moveTo(M,fy);g.lineTo(W-M,fy);g.stroke();
+  const diffs=per.filter(p=>p.day!=="*").map(p=>`${p.day}: ${p.kind==="lesson"?"Jam "+p.period:(p.label||"Istirahat")} ${p.startsAt}–${p.endsAt}`);
+  g.textAlign="left";g.fillStyle=C.muted;g.font=`500 25px ${SANS}`;
+  let yy=fy+44;if(diffs.length){g.fillStyle=C.maroon;g.font=`700 25px ${SANS}`;g.fillText("Jadwal khusus",M,yy);g.fillStyle=C.muted;g.font=`500 25px ${SANS}`;yy+=34;
+    wrap(diffs.join("  ·  "),W-2*M,`500 25px ${SANS}`).slice(0,2).forEach(l=>{g.fillText(l,M,yy);yy+=32})}
+  g.fillStyle=C.muted;g.font=`500 24px ${SANS}`;g.textAlign="left";g.fillText("Sumber data: tabel kelas7mit_schedule · server.7mit",M,H-48);
+  g.textAlign="right";g.fillText("Diunduh "+new Intl.DateTimeFormat("id-ID",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jakarta"}).format(new Date())+" WIB",W-M,H-48);
+  return cv;
+}
+// PDF A4 lanskap berisi satu gambar JPEG (tanpa pustaka luar).
+function k7JpegToPdf(jpeg,w,h){
+  const enc=new TextEncoder(),parts=[],offs=[];let len=0;
+  const push=b=>{const u=typeof b==="string"?enc.encode(b):b;parts.push(u);len+=u.length};
+  const obj=(n,body)=>{offs[n]=len;push(`${n} 0 obj\n`);push(body);push("\nendobj\n")};
+  push(new Uint8Array([0x25,0x50,0x44,0x46,0x2d,0x31,0x2e,0x34,0x0a,0x25,0xe2,0xe3,0xcf,0xd3,0x0a]));
+  obj(1,"<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2,"<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+  obj(3,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 841.89 595.28] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>");
+  offs[4]=len;push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`);push(jpeg);push("\nendstream\nendobj\n");
+  const content="q 841.89 0 0 595.28 0 0 cm /Im0 Do Q";
+  obj(5,`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  const xr=len;let x=`xref\n0 6\n0000000000 65535 f \n`;for(let i=1;i<=5;i++)x+=String(offs[i]).padStart(10,"0")+" 00000 n \n";
+  push(x+`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF\n`);
+  const out=new Uint8Array(len);let p=0;for(const u of parts){out.set(u,p);p+=u.length}return out;
+}
+window.k7SchExport=k7SchExport;
+
 function lsFindRecord(type,id){
   const map={course:"lmsCourses",material:"lmsMaterials",assignment:"lmsAssignments",grade:"lmsGrades",attendance:"sisAttendance",schedule:"sisSchedule"};
   const key=map[type];return key?lsRows(key).find(x=>String(x.id)===String(id)):null
 }
 document.addEventListener("click",event=>{
+  const exp=event.target.closest("[data-k7sch-export]");
+  if(exp){k7SchExport(exp.dataset.k7schExport,exp);return}
   const refresh=event.target.closest("[data-ls-refresh]");
   if(refresh){lsLoadSeparateData(true);return}
   const tab=event.target.closest("[data-ls-tab]");
