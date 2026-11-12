@@ -21622,7 +21622,7 @@ function k7SchPoster(rows,per,logo){
   const nowW=new Date(Date.now()+7*3600000),dateTxt=new Intl.DateTimeFormat("id-ID",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"}).format(nowW),dateEn=new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric",timeZone:"UTC"}).format(nowW);
   g.textAlign="right";g.fillStyle="#f6d7c4";g.font=`600 26px ${SANS}`;g.fillText("DIPERBARUI · UPDATED",W-M,118);g.fillStyle="#fff";g.font=`700 42px ${SANS}`;g.fillText(dateTxt,W-M,164);g.fillStyle="#fff2eb";g.font=`500 30px ${SANS}`;g.fillText(dateEn,W-M,204);g.fillStyle="#f6d7c4";g.font=`600 26px ${SANS}`;g.fillText("OneClass.7MIT",W-M,244);
   // grid geometry
-  const keys=["0","1","2","3","4","5","6","Lunch","7","8"],dayW=220,gx=M,gy=340,headH=128,footH=250;
+  const keys=["0","1","2","3","4","5","6","Lunch","7","8"],dayW=220,gx=M,gy=325,headH=128,footH=290;
   const avail=W-2*M-dayW,wOf=k=>k==="0"?200:k==="Lunch"?150:(avail-350)/8;
   const xOf={};let x=gx+dayW;for(const k of keys){xOf[k]=x;x+=wOf(k)}
   const rowH=Math.floor((H-gy-headH-footH)/5),slot=(day,k)=>per.find(p=>p.day===day&&p.period===k)||per.find(p=>p.day==="*"&&p.period===k)||null;
@@ -21651,7 +21651,7 @@ function k7SchPoster(rows,per,logo){
       g.fillStyle=bgc;rr(cx,cy,cw,ch,18);g.fill();g.fillStyle=fg;rr(cx,cy+14,7,ch-28,4);g.fill();
       g.textAlign="left";const tx=cx+22,tw=cw-34;
       const multi=list.length>1;
-      const GLOSS={"Agama":"Agama · Religion","Pendidikan Pancasila":"Pendidikan Pancasila · Civics","Flag Ceremony":"Flag Ceremony · Upacara","Mandatory Club":"Mandatory Club · Klub Wajib"};
+      const GLOSS={"Agama":"Agama · Religion","Pendidikan Pancasila":"Pendidikan Pancasila · Civics","Flag Ceremony":"Flag Ceremony · Upacara"};
       const label=ps===0?(/dear/i.test(f.subject)?"DEAR Time":(GLOSS[f.subject]||f.subject)):(GLOSS[f.subject]||f.subject);
       g.fillStyle=C.ink;
       const lines=wrap(label,tw,`700 ${multi?28:31}px ${SANS}`).slice(0,multi?2:3);
@@ -21663,8 +21663,8 @@ function k7SchPoster(rows,per,logo){
         const st=f.startsAt?`${f.startsAt}–${f.endsAt}`:"";
         const meta=ps===0?st:[f.room,st].filter(Boolean).join(" · ");if(meta)g.fillText(fit(meta,tw,`500 24px ${SANS}`),tx,Math.min(ty+4,cy+ch-14));
       }else{
-        const cols=cw>380?2:1,chipW=(tw-(cols-1)*10)/cols,chipH=34;let n=0;
-        for(const r of list){const col=n%cols,row=Math.floor(n/cols),px=tx+col*(chipW+10),py=ty-18+row*(chipH+6);if(py+chipH>cy+ch-6)break;
+        const cols=cw>380?2:1,chipW=(tw-(cols-1)*10)/cols,chipH=32;let n=0;
+        for(const r of list){const col=n%cols,row=Math.floor(n/cols),px=tx+col*(chipW+10),py=ty-24+row*(chipH+5);if(py+chipH>cy+ch-6)break;
           g.fillStyle="#fff";rr(px,py,chipW,chipH,12);g.fill();g.fillStyle=fg;g.font=`700 19px ${SANS}`;
           g.fillText(fit([r.group,r.room].filter(Boolean).join(" · "),chipW-16,`700 19px ${SANS}`),px+9,py+24);n++}
       }
@@ -21673,13 +21673,30 @@ function k7SchPoster(rows,per,logo){
   // lunch band
   const lx=xOf.Lunch,ly=top,lh=rowH*5-10;g.fillStyle="#fdecc8";rr(lx+6,ly,wOf("Lunch")-12,lh,22);g.fill();
   g.save();g.translate(lx+wOf("Lunch")/2+10,ly+lh/2);g.rotate(-Math.PI/2);g.textAlign="center";g.fillStyle="#7a4205";g.font=`700 38px ${SANS}`;g.fillText("ISTIRAHAT · LUNCH BREAK",0,0);g.restore();
-  // footer
-  const fy=H-footH+30;g.strokeStyle=C.line;g.lineWidth=2;g.beginPath();g.moveTo(M,fy);g.lineTo(W-M,fy);g.stroke();
-  const EN2={Senin:"Mon",Selasa:"Tue",Rabu:"Wed",Kamis:"Thu",Jumat:"Fri"};
-  const diffs=per.filter(p=>p.day!=="*").map(p=>`${p.day}/${EN2[p.day]||p.day}: ${p.kind==="lesson"?"Jam/P"+p.period:(/lunch/i.test(p.period)?"Istirahat/Lunch":/sholat/i.test(p.period)?"Sholat Jum'at/Friday Prayer":(p.label||"Istirahat"))} ${p.startsAt}–${p.endsAt}`);
-  g.textAlign="left";g.fillStyle=C.muted;g.font=`500 25px ${SANS}`;
-  let yy=fy+44;if(diffs.length){g.fillStyle=C.maroon;g.font=`700 25px ${SANS}`;g.fillText("Jadwal khusus · Special schedule",M,yy);g.fillStyle=C.muted;g.font=`500 25px ${SANS}`;yy+=34;
-    wrap(diffs.join("  ·  "),W-2*M,`500 25px ${SANS}`).slice(0,2).forEach(l=>{g.fillText(l,M,yy);yy+=32})}
+  // footer: jadwal khusus sebagai kartu per hari, tiap entri satu baris (label · jam)
+  const fy=H-footH+24;
+  const EN2={Senin:"Monday",Selasa:"Tuesday",Rabu:"Wednesday",Kamis:"Thursday",Jumat:"Friday"};
+  const labelOf=p=>p.kind==="lesson"?`Jam ${p.period} · Period ${p.period}`:/lunch/i.test(p.period)?"Istirahat · Lunch":/sholat/i.test(p.period)?"Sholat Jum'at · Friday Prayer":(p.label||"Istirahat");
+  const byDay=days.map(d=>[d,per.filter(p=>p.day===d).sort((x,y)=>(mins2(x.startsAt)||0)-(mins2(y.startsAt)||0))]).filter(x=>x[1].length);
+  function mins2(t){const m=/^(\d{1,2}):(\d{2})$/.exec(t||"");return m?(+m[1])*60+(+m[2]):null}
+  g.textAlign="left";g.fillStyle=C.maroon;g.font=`700 28px ${SANS}`;g.fillText("Jadwal khusus",M,fy+16);
+  const tw0=g.measureText("Jadwal khusus").width;g.fillStyle=C.muted;g.font=`500 26px ${SANS}`;g.fillText("· Special schedule",M+tw0+12,fy+16);
+  if(byDay.length){
+    const cardsTop=fy+38,gap=22,totalW=W-2*M,weights=byDay.map(x=>Math.max(1,Math.ceil(x[1].length/3))),sumW=weights.reduce((a,b)=>a+b,0);
+    let cx=M;
+    byDay.forEach(([d,items],i)=>{
+      const cw=Math.floor((totalW-gap*(byDay.length-1))*weights[i]/sumW),ch=150;
+      g.fillStyle="#fff";rr(cx,cardsTop,cw,ch,20);g.fill();g.strokeStyle=C.line;g.lineWidth=2;g.stroke();
+      g.fillStyle=C.maroon;rr(cx,cardsTop,cw,48,20);g.fill();g.fillRect(cx,cardsTop+24,cw,24);
+      g.fillStyle="#fff";g.textAlign="left";g.font=`700 28px ${SANS}`;g.fillText(`${d} · ${EN2[d]}`,cx+22,cardsTop+34);
+      const cols=items.length>3?2:1,colW=(cw-44-(cols-1)*24)/cols,perCol=Math.ceil(items.length/cols);
+      items.forEach((p,k)=>{const col=Math.floor(k/perCol),row=k%perCol,px=cx+22+col*(colW+24),py=cardsTop+48+30+row*32;
+        g.textAlign="left";g.fillStyle=C.ink;g.font=`600 23px ${SANS}`;g.fillText(fit(labelOf(p),colW-190,`600 23px ${SANS}`),px,py);
+        g.textAlign="right";g.fillStyle=C.maroon;g.font=`700 23px ${SANS}`;g.fillText(`${p.startsAt}–${p.endsAt}`,px+colW,py);
+        if(row<perCol-1&&k<items.length-1){g.strokeStyle=C.line;g.lineWidth=1.5;g.beginPath();g.moveTo(px,py+10);g.lineTo(px+colW,py+10);g.stroke()}});
+      cx+=cw+gap;
+    });
+  }
   g.fillStyle=C.muted;g.font=`500 24px ${SANS}`;g.textAlign="left";g.fillText("Sumber data / Data source: kelas7mit_schedule · server.7mit",M,H-48);
   g.textAlign="right";g.fillText("Diunduh / Downloaded "+new Intl.DateTimeFormat("id-ID",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jakarta"}).format(new Date())+" WIB",W-M,H-48);
   return cv;
