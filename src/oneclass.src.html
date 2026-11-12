@@ -26048,7 +26048,7 @@ passwordToggle?.addEventListener("click",()=>{
       const text=await response.text();
       let result={};
       try{result=text?JSON.parse(text):{}}catch(error){}
-      if(!response.ok||result?.ok===false)throw new Error(result?.message||`HTTP ${response.status}`);
+      if(!response.ok||result?.ok===false)throw Object.assign(new Error(result?.message||`HTTP ${response.status}`),{k7Conflict:response.status===409});
 @@oc[guru,pengurus]
       async function sendSyncAction(action){
         const response=await fetch(`${SUPABASE_URL}/functions/v1/kelas7mit-data-api`,{
@@ -26074,7 +26074,7 @@ passwordToggle?.addEventListener("click",()=>{
       const attempt=await sendSyncAction("patch");
 
       if(!attempt.response.ok||attempt.result?.ok===false){
-        throw new Error(attempt.result?.message||attempt.text||`HTTP ${attempt.response.status}`);
+        throw Object.assign(new Error(attempt.result?.message||attempt.text||`HTTP ${attempt.response.status}`),{k7Conflict:attempt.response.status===409});
       }
 
       const result=attempt.result||{};
@@ -26133,6 +26133,18 @@ passwordToggle?.addEventListener("click",()=>{
 
     }catch(error){
       console.error("Simpan data gagal:",error);
+      if(error?.k7Conflict){
+        // Server menolak karena data di perangkat ini sudah usang: ambil data terbaru, jangan menimpa.
+        try{if(portalData?.meta){portalData.meta.dirty=false;portalData.meta.dirtySince=""}}catch(ignore){}
+        try{if(typeof pendingSync!=="undefined")pendingSync=false}catch(ignore){}
+        persistQueued=false;centralRowCache=null;centralRowCacheAt=0;
+        try{if(typeof hideUnsavedNotice==="function")hideUnsavedNotice()}catch(ignore){}
+        persistBusy=false;
+        try{await reliableLoad({showToast:false})}catch(ignore){}
+        try{if(typeof setSyncButtonsDisabled==="function")setSyncButtonsDisabled(false)}catch(ignore){}
+        if(typeof toast==="function")toast(String(error.message||"Data sudah diubah dari perangkat lain. Data terbaru dimuat; ulangi perubahan Anda."));
+        return false;
+      }
       if(portalData?.meta)portalData.meta.dirty=true;
 @@oc[student]
       if(typeof pendingSync!=="undefined")pendingSync=true;
